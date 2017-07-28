@@ -73,6 +73,18 @@
 #define LOG_MASK(pri)  (1 << (pri))	/* mask for one priority */
 #define LOG_UPTO(pri)  ((1 << ((pri)+1)) - 1)	/* all priorities through pri */
 
+
+class DLRMessages
+{
+	public:
+		time_t timestamp;
+		uint16_t logLevel;
+		char msg[80];		DLRMessages()
+		{}
+		~DLRMessages()
+		{}
+};
+
 class DLRMessagesQueue: public DLRObject
 {
 	public:
