@@ -1,5 +1,5 @@
-#ifndef MessagesQueue_HPP
-#define MessagesQueue_HPP
+#ifndef DLRMessagesQueue_HPP
+#define DLRMessagesQueue_HPP
 
 #include <stdint.h>
 #include <queue>
@@ -73,13 +73,14 @@
 #define LOG_MASK(pri)  (1 << (pri))	/* mask for one priority */
 #define LOG_UPTO(pri)  ((1 << ((pri)+1)) - 1)	/* all priorities through pri */
 
-class MessagesQueue: public DLRObject
+class DLRMessagesQueue: public DLRObject
 {
-	MessagesQueue()
-	{}
-	~MessagesQueue()
-	{}
-};
+	public:
+		DLRMessagesQueue()
+		{}
+		~DLRMessagesQueue()
+		{}
+} MessagesQueue;
 
 
-#endif //MessagesQueue_HPP
+#endif //DLRMessagesQueue_HPP
