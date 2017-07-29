@@ -1,3 +1,6 @@
+
+// => const __FlashStringHelper 
+
 unsigned char ca_crt[] = {};
 unsigned int  ca_crt_len = 0;
 unsigned char crt[] = {};

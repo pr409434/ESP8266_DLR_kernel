@@ -7,6 +7,13 @@ const char* ssid        = "................";
 const char* password    = "................";
 const char* mqtt_server = "................";
 ***********************************************/
+
+/*
+wifi_station_set_hostname("xxxxx");
+wifi_station_get_hostname();
+*/
+
+
 #include "certificates.h"
 
 #include <ESP8266WiFi.h>
@@ -22,6 +29,15 @@ const char* mqtt_server = "................";
 #include "DLRMessagesQueue.hpp"
 #include "DLRObjectManager.hpp"
 
+/*
+// Expose Espressif SDK functionality - wrapped in ifdef so that it still
+// compiles on other platforms
+#ifdef ESP8266
+extern "C" {
+#include "user_interface.h"
+}
+#endif
+*/
 
 void WiFiEvent(WiFiEvent_t event) {
     switch(event) {
