@@ -2,7 +2,7 @@
 #define DLRObjectManager_HPP
 
 #include <stdint.h>
-#include <list>
+#include <vector>
 #include <functional>
 
 class DLRObjectManager: public DLRObject
@@ -25,7 +25,7 @@ class DLRObjectManager: public DLRObject
 		}
 		error_t main_setup()
 		{
-			for ( std::list<DLRObject *>::iterator it=DLRObjectStack.begin(); it!=DLRObjectStack.end(); ++it )
+			for ( std::vector<DLRObject *>::iterator it=DLRObjectStack.begin(); it!=DLRObjectStack.end(); ++it )
 			{
 				yield();
 				(*it)->setup();
@@ -34,7 +34,7 @@ class DLRObjectManager: public DLRObject
 		}
 		error_t main_loop()
 		{
-			for ( std::list<DLRObject *>::iterator it=DLRObjectStack.begin(); it!=DLRObjectStack.end(); ++it )
+			for ( std::vector<DLRObject *>::iterator it=DLRObjectStack.begin(); it!=DLRObjectStack.end(); ++it )
 			{
 				yield();
 				(*it)->loop();

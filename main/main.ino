@@ -18,6 +18,7 @@ const char* mqtt_server = "................";
 #include <functional>
 
 #include "DLRObject.hpp"
+#include "DLRMessages.hpp"
 #include "DLRMessagesQueue.hpp"
 #include "DLRObjectManager.hpp"
 
