@@ -40,36 +40,47 @@ extern "C" {
 #endif
 */
 
-/*
-void WiFiEvent(WiFiEvent_t event) {
-    switch(event) {
-        case WIFI_EVENT_STAMODE_GOT_IP:
-            Serial.println("WiFi connected. IP address: " + String(WiFi.localIP().toString()) + " hostname: "+ WiFi.hostname() + "  SSID: " + WiFi.SSID());
-            break;
-        case WIFI_EVENT_STAMODE_DISCONNECTED:
-            Serial.println("WiFi client lost connection");
-            break;
-        case WIFI_EVENT_STAMODE_CONNECTED:
-            Serial.println("WiFi client connected");
-            break;
-        case WIFI_EVENT_STAMODE_AUTHMODE_CHANGE:
-            Serial.println("WiFi client authentication mode changed.");
-            break;
-        //case WIFI_STAMODE_DHCP_TIMEOUT:                             THIS IS A NEW CONSTANT ENABLE WITH UPDATED SDK
-          //  Serial.println("WiFi client DHCP timeout reached.");
-            //break;
-        case WIFI_EVENT_SOFTAPMODE_STACONNECTED:
-            Serial.println("WiFi accesspoint: new client connected. Clients: "  + String(WiFi.softAPgetStationNum()));
-             break;
-        case WIFI_EVENT_SOFTAPMODE_STADISCONNECTED:
-            Serial.println("WiFi accesspoint: client disconnected. Clients: " + String(WiFi.softAPgetStationNum()));
-             break;
-        case WIFI_EVENT_SOFTAPMODE_PROBEREQRECVED:
-            //Serial.println("WiFi accesspoint: probe request received.");
-            break; 
-      }
+void WiFiEvent( WiFiEvent_t event )
+{
+	switch( event )
+	{
+		case WIFI_EVENT_STAMODE_GOT_IP:
+			addLog( 0 , LOG_DEBUG , "WiFi connected. IP address:%s hostname:%s SSID: %s\n"
+						, WiFi.localIP().toString().c_str()
+						, WiFi.hostname().c_str()
+						, WiFi.SSID().c_str()
+					);
+			break;
+		case WIFI_EVENT_STAMODE_DISCONNECTED:
+			addLog( 0 , LOG_DEBUG , "WiFi client lost connection\n");
+			break;
+		case WIFI_EVENT_STAMODE_CONNECTED:
+			addLog( 0 , LOG_DEBUG , "WiFi client connected\n");
+			break;
+		case WIFI_EVENT_STAMODE_AUTHMODE_CHANGE:
+			addLog( 0 , LOG_DEBUG , "WiFi client authentication mode changed.\n");
+			break;
+		/*
+		// THIS IS A NEW CONSTANT ENABLE WITH UPDATED SDK
+		case WIFI_STAMODE_DHCP_TIMEOUT:
+			addLog( 0 , LOG_DEBUG , "WiFi client DHCP timeout reached.");
+			break;
+		*/
+		case WIFI_EVENT_SOFTAPMODE_STACONNECTED:
+			addLog( 0 , LOG_DEBUG , "WiFi accesspoint: new client connected. Clients: %d\n" , WiFi.softAPgetStationNum() );
+			break;
+		case WIFI_EVENT_SOFTAPMODE_STADISCONNECTED:
+			addLog( 0 , LOG_DEBUG , "WiFi accesspoint: client disconnected. Clients: %d\n" , WiFi.softAPgetStationNum() );
+			break;
+		case WIFI_EVENT_SOFTAPMODE_PROBEREQRECVED:
+			addLog( 0 , LOG_DEBUG , "WiFi accesspoint: probe request received.\n" );
+			break; 
+		default:
+			addLog( 0 , LOG_DEBUG , "WiFiEvent: unlnow event received.\n" );
+			break;
+	}
 }
-*/
+
 
 WiFiClient espClient;
 //WiFiClientSecure espClient;
@@ -90,17 +101,17 @@ DLRObject demo_03;
 */
 void setup()
 {
-	Serial.begin(115200);
+	Serial.begin( 115200 );
 	
 	ObjectManager.main_setup();
+	addLog( 0 , LOG_DEBUG , "Start setup() -> ObjectManager.size(): %ld\n" , ObjectManager.size() );
 	
-	
-	//WiFi.onEvent(WiFiEvent);
+	WiFi.onEvent( WiFiEvent );
+
 	
 	// Connect to WiFi network
 	WiFi.begin(ssid, password);
-	Serial.println("");
-
+	Serial.print("Connect to WiFi network:");
     // Wait for connection
 	while (WiFi.status() != WL_CONNECTED)
 	{
@@ -108,26 +119,20 @@ void setup()
 		Serial.print(".");
     }
 	Serial.println("");
-	Serial.print("Connected to ");
-	Serial.println(ssid);
-	Serial.print("IP address: ");
-	Serial.println(WiFi.localIP());
+	addLog( 0 , LOG_DEBUG , "Connected to %s %s\n" , ssid , WiFi.localIP().toString().c_str() );
 	
 	configTime( 2 * 3600 , 0 , // , 1 * 3600,
 				"0.pool.ntp.org",
 				"1.pool.ntp.org",
 				"2.pool.ntp.org");
-
-	Serial.print("NTP status:");
 	uint16_t timeout = 0;
 	time_t timestamp = time( NULL );
 	while (
-			(timestamp==0) &&
-			( timeout <  30 )
+			( timestamp == 0 ) &&
+			( timeout <  30  )
 		  )
 	{
 		yield();
-		Serial.print(".");
 		delay( 5000 );
 		timestamp = time( NULL );
 		timeout += 5;
@@ -135,23 +140,23 @@ void setup()
 	if( timestamp > (2017 - 1970)*(365*24*3600) ) 
 	{
 		system_boot_time = timestamp - ( millis()/1000);
-		Serial.println("\nNTP ok");
+		addLog( 0 , LOG_DEBUG , "NTP on\n");
+	}
+	else
+	{
+		addLog( 0 , LOG_DEBUG , "NTP off\n");
 	}
 	
-
-	Serial.println("\nESP8266 SDK Version: " +String(ESP.getSdkVersion()));
-
+	addLog( 0 , LOG_DEBUG , "ESP8266 SDK Version: %s\n" , ESP.getSdkVersion() );
 	
 	//espClient.setCACert(ca_crt, ca_crt_len);
     //espClient.setCertificate(dlr_000_crt, dlr_000_crt_len);
     //espClient.setPrivateKey(dlr_000_key, dlr_000_key_len);
 	
-    client.setServer( mqtt_server , 1883); // 9001 ); //1883 ); // 8883);
+    client.setServer( mqtt_server , 1883 ); // 9001 ); //1883 ); // 8883);
     client.setCallback(callback);
 	
-	Serial.print("ObjectManager.size(): ");
-	Serial.print( ObjectManager.size() );
-	Serial.println("");
+	addLog( 0 , LOG_DEBUG , "Exit setup() -> ObjectManager.size(): %ld\n" , ObjectManager.size() );
 }
 
 void callback(char* topic, byte* payload, unsigned int length) {
@@ -179,18 +184,16 @@ void callback(char* topic, byte* payload, unsigned int length) {
 void reconnect() {
     while(!client.connected())
 	{
-		Serial.print("Attempting MQTT connection...");
+		addLog( 0 , LOG_DEBUG , "Attempting MQTT connection...\n");
         if( client.connect("dlr_000", "dlr", "dragon"))
 		{
-			Serial.println("connected");
+			addLog( 0 , LOG_DEBUG , "MQTT connected to: %s\n" , mqtt_server );
             // Resubscribe to all your topics here so that they are
             // resubscribed each time you reconnect
 			client.publish("outTopic", "hello world");
 			client.subscribe("inTopic");
         } else {
-			Serial.print("failed, rc=");
-			Serial.print(client.state());
-			Serial.println(" try again in 5 seconds");
+			addLog( 0 , LOG_DEBUG , "failed, rc=%d retry again in 5 seconds\n" , client.state() );
 			// Wait 5 seconds before retrying
 			delay(5000);
         }
@@ -213,7 +216,9 @@ void loop()
 	{
 		lastMsg = now;
 		++value;
-		snprintf (msg, 75, "hello world #%ld", value);
+		snprintf( msg, 75, "hello world #%ld", value);
+		client.publish("outTopic", msg );
+		//addLog( 0 , LOG_DEBUG , "Publish message: %s\n", msg );
 		/*
 		Serial.print("s:");
 		Serial.print( Serial.availableForWrite() );
@@ -223,19 +228,15 @@ void loop()
 		Serial.print("s:");
 		Serial.print( Serial.availableForWrite() );
 		Serial.println();
-		client.publish("outTopic", msg);
+		
 		*/
 		/*
 		Serial.print("MessagesQueue.size: ");
 		Serial.print( MessagesQueue.size() );
 		Serial.println();
 		*/
-		//std::string test = string_format( "MessagesQueue.size: %d\n" , MessagesQueue.size() );
-		Serial.println( (string_format( "B_MessagesQueue.size: %d" , MessagesQueue.size() )).c_str() );
-		addLog( 0 , LOG_DEBUG , "MessagesQueue.size: %ld\n" , MessagesQueue.size() );
-		Serial.println( (string_format( "E_MessagesQueue.size: %d" , MessagesQueue.size() )).c_str() );
-		Serial.println();
-		//addLog( 0 , LOG_DEBUG , "MessagesQueue\n" );
+		//Serial.println( (String_Format( "B_MessagesQueue.size: %d" , MessagesQueue.size() )).c_str() );
+		//addLog( 0 , LOG_DEBUG , "#%ld\tMessagesQueue.size: %ld\n" , value , MessagesQueue.size() );
 	}
 }
 

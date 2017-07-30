@@ -106,7 +106,7 @@ std::string string_format(const std::string fmt, ...) {
 
 //std::string string_format(const std::string fmt, ...)
 String String_Format( const String fmt , ... )
- {
+{
 	int size = ( (int) fmt.length() ) + 32; //* 2 + 50;   // Use a rubric appropriate for your code
 	String str;
 	va_list ap;
@@ -154,9 +154,9 @@ class DLRMessage
 		ObjectID_t  from_ObjectID;
 		uint16_t    SysLog_Code;
 
-		char                      *payload   = nullptr;
+		char        *payload   = nullptr;
 
-		DLRMessage( ObjectID_t ObjectID , uint16_t pri , const String format , ... )
+		DLRMessage( ObjectID_t ObjectID , uint16_t pri , const char *message )
 		{
 			microSecond = micros() % 1000000;
 			timestamp   = ( millis() / 1000 ) + TimerTimeOffset;
@@ -164,20 +164,11 @@ class DLRMessage
 			from_ObjectID = ObjectID;
 			
 			SysLog_Code   = LOG_ObjectID_PRI( ObjectID , pri );
-
-			char buffer[0xff];
-			va_list args;
-			va_start( args , format );
-			int message_size = vsnprintf( buffer , 0xff , format.c_str() , args );
-			va_end (args);
 			
-			if( message_size > 0 )
-			{
-				//  Copy buffer buffer
-				payload = new char[ message_size +1 ];
-				strncpy ( payload , buffer , message_size );
-				payload[message_size] = 0;
-			}
+			size_t message_size = strlen( message );
+			payload = new char[ message_size +1 ];
+			strncpy( payload , message , message_size );
+			payload[message_size] = 0;
 		}
 		DLRMessage()
 		{
@@ -229,14 +220,58 @@ DLRMessagesQueue MessagesQueue;
 MessagesQueue.push( new DLRMessage( ObjectID , pri , message ) );
 */
 
+
+error_t addLog( ObjectID_t ObjectID , uint16_t pri , const String fmt , ... )
+{
+	int size = ( (int) fmt.length() ) + 32; //* 2 + 50;   // Use a rubric appropriate for your code
+	String str;
+	va_list ap;
+	while (1) // Maximum two passes on a POSIX system...
+	{     
+		if( ! str.reserve( size ) )
+		{
+			break;
+		}
+		va_start( ap , fmt );
+		// Notice that only when this returned value is non-negative and less than n, the string has been completely written.
+		int n = vsnprintf( (char *) str.begin() , size , fmt.c_str() , ap );
+		va_end( ap );
+		if ( n > -1 && n < size )
+		{
+			// Everything worked
+			str.reserve( n );
+			//return str;
+			break;
+		}
+		if ( n > -1 )
+		{
+			// Needed size returned
+			size = n + 1;   // For null char
+		}
+		else
+		{
+			// Guess at a larger size (OS specific) => attempt to crash...
+			size *= 2;
+		}
+	}
+	MessagesQueue.push( new DLRMessage( ObjectID , pri , str.c_str() ) );
+	//delete str;
+	return( 0 );
+}
+
+
+
+/*
 error_t addLog( ObjectID_t ObjectID , uint16_t pri ,  const String format , ...  )
 {
 	va_list args;
 	va_start( args , format );
-	MessagesQueue.push( new DLRMessage( ObjectID , pri , format , args ) );
+	String message = String_Format( format , args );
+	MessagesQueue.push( new DLRMessage( ObjectID , pri , message.c_str() ) );
 	va_end (args);
 	return( 0 );
 }
+*/
 
 /*
 error_t _sendLog( ObjectID_t ObjectID , uint16_t pri , const char *message )
