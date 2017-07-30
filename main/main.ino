@@ -11,34 +11,7 @@ const char* mqtt_server = "................";
 wifi_station_set_hostname("xxxxx");
 wifi_station_get_hostname();
 */
-
-
-#include "certificates.h"
-
-#include <ESP8266WiFi.h>
-#include <PubSubClient.h>
-#include <time.h>
-time_t system_boot_time = 0;
-time_t TimerTimeOffset  = 0;
-
-#include <stdint.h>
-#include <list>
-#include <functional>
-
-#include "DLRObject.hpp"
-//#include "DLRMessages.hpp"
-#include "DLRMessagesQueue.hpp"
-#include "DLRObjectManager.hpp"
-
-/*
-// Expose Espressif SDK functionality - wrapped in ifdef so that it still
-// compiles on other platforms
-#ifdef ESP8266
-extern "C" {
-#include "user_interface.h"
-}
-#endif
-*/
+#include "Configuration.h"
 
 void WiFiEvent( WiFiEvent_t event )
 {
@@ -73,7 +46,7 @@ void WiFiEvent( WiFiEvent_t event )
 			addLog( 0 , LOG_DEBUG , "WiFi accesspoint: client disconnected. Clients: %d\n" , WiFi.softAPgetStationNum() );
 			break;
 		case WIFI_EVENT_SOFTAPMODE_PROBEREQRECVED:
-			addLog( 0 , LOG_DEBUG , "WiFi accesspoint: probe request received.\n" );
+			//addLog( 0 , LOG_DEBUG , "WiFi accesspoint: probe request received.\n" );
 			break; 
 		default:
 			addLog( 0 , LOG_DEBUG , "WiFiEvent: unlnow event received.\n" );
@@ -93,8 +66,8 @@ long lastMsg = 0;
 char msg[50];
 int value = 0;
 
-DLRObject demo;
 /*
+DLRObject demo;
 DLRObject demo_01;
 DLRObject demo_02;
 DLRObject demo_03;	
@@ -102,6 +75,7 @@ DLRObject demo_03;
 void setup()
 {
 	Serial.begin( 115200 );
+	Serial.println("\n\n/*********************************************/");
 	
 	ObjectManager.main_setup();
 	addLog( 0 , LOG_DEBUG , "Start setup() -> ObjectManager.size(): %ld\n" , ObjectManager.size() );
@@ -118,7 +92,8 @@ void setup()
 		delay(500);
 		Serial.print(".");
     }
-	Serial.println("");
+	Serial.println();
+	
 	addLog( 0 , LOG_DEBUG , "Connected to %s %s\n" , ssid , WiFi.localIP().toString().c_str() );
 	
 	configTime( 2 * 3600 , 0 , // , 1 * 3600,

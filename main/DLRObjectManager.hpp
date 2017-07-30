@@ -42,6 +42,6 @@ class DLRObjectManager: public DLRObject
 			return( 0 );
 		}
 		
-} ObjectManager;
+};
 
 #endif //DLRObjectManager_HPP
