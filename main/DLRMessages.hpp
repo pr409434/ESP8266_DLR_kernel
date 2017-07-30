@@ -1,6 +1,7 @@
 #ifndef DLRMessages_HPP
 #define DLRMessages_HPP
 
+/*
 #include <stdint.h>
 #include <functional>
 
@@ -73,20 +74,45 @@
 #define LOG_UPTO(pri)  ((1 << ((pri)+1)) - 1)	/* all priorities through pri */
 
 
+
+#define LOG_ObjectID_PRI( fac , pri ) ((( fac + 31 ) << 3) | (pri))
+
+
 class DLRMessage
 {
 	public:
 		time_t      timestamp;
-		size_t      from_ObjectID;
+		uint32_t	microSecond;
+		
+		ObjectID_t  from_ObjectID;
 		uint16_t    SysLog_Code;
-		char *msg;
+		
+		char                      *payload   = nullptr;
+		const __FlashStringHelper *F_payload = nullptr;
+		
+		DLRMessage( ObjectID_t ObjectID , uint16_t pri , const char *message )
+		{
+			microSecond = micros() % 1000000;
+			timestamp   = ( millis() / 1000 ) + TimerTimeOffset;
+			
+			from_ObjectID = ObjectID;
+			
+			SysLog_Code   = LOG_ObjectID_PRI( ObjectID , pri );
+			
+			size_t message_size = strlen(message);
+			payload = new char[message_size];
+			strncpy ( payload , message , message_size );
+		}
 		DLRMessage()
 		{
-			msg = new char[80];
+			payload = new char[80];
 		}
 		~DLRMessage()
 		{
-			delete msg;
+			if( payload != nullptr )
+			{
+				delete payload;
+			}
 		}
 		error_t setup()
 		{
@@ -97,7 +123,6 @@ class DLRMessage
 			return( 0 );
 		}
 };
-
-
+*/
 
 #endif //DLRMessage_HPP

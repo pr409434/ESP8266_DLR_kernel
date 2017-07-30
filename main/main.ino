@@ -7,7 +7,6 @@ const char* ssid        = "................";
 const char* password    = "................";
 const char* mqtt_server = "................";
 ***********************************************/
-
 /*
 wifi_station_set_hostname("xxxxx");
 wifi_station_get_hostname();
@@ -19,13 +18,15 @@ wifi_station_get_hostname();
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
 #include <time.h>
+time_t system_boot_time = 0;
+time_t TimerTimeOffset  = 0;
 
 #include <stdint.h>
 #include <list>
 #include <functional>
 
 #include "DLRObject.hpp"
-#include "DLRMessages.hpp"
+//#include "DLRMessages.hpp"
 #include "DLRMessagesQueue.hpp"
 #include "DLRObjectManager.hpp"
 
@@ -39,6 +40,7 @@ extern "C" {
 #endif
 */
 
+/*
 void WiFiEvent(WiFiEvent_t event) {
     switch(event) {
         case WIFI_EVENT_STAMODE_GOT_IP:
@@ -67,7 +69,7 @@ void WiFiEvent(WiFiEvent_t event) {
             break; 
       }
 }
-
+*/
 
 WiFiClient espClient;
 //WiFiClientSecure espClient;
@@ -86,7 +88,6 @@ DLRObject demo_01;
 DLRObject demo_02;
 DLRObject demo_03;	
 */
-time_t system_boot_time = 0;
 void setup()
 {
 	Serial.begin(115200);
@@ -94,7 +95,7 @@ void setup()
 	ObjectManager.main_setup();
 	
 	
-	WiFi.onEvent(WiFiEvent);
+	//WiFi.onEvent(WiFiEvent);
 	
 	// Connect to WiFi network
 	WiFi.begin(ssid, password);
@@ -213,9 +214,28 @@ void loop()
 		lastMsg = now;
 		++value;
 		snprintf (msg, 75, "hello world #%ld", value);
+		/*
+		Serial.print("s:");
+		Serial.print( Serial.availableForWrite() );
+		Serial.println();
 		Serial.print("Publish message: ");
 		Serial.println(msg);
+		Serial.print("s:");
+		Serial.print( Serial.availableForWrite() );
+		Serial.println();
 		client.publish("outTopic", msg);
+		*/
+		/*
+		Serial.print("MessagesQueue.size: ");
+		Serial.print( MessagesQueue.size() );
+		Serial.println();
+		*/
+		//std::string test = string_format( "MessagesQueue.size: %d\n" , MessagesQueue.size() );
+		Serial.println( (string_format( "B_MessagesQueue.size: %d" , MessagesQueue.size() )).c_str() );
+		addLog( 0 , LOG_DEBUG , "MessagesQueue.size: %ld\n" , MessagesQueue.size() );
+		Serial.println( (string_format( "E_MessagesQueue.size: %d" , MessagesQueue.size() )).c_str() );
+		Serial.println();
+		//addLog( 0 , LOG_DEBUG , "MessagesQueue\n" );
 	}
 }
 
