@@ -1,7 +1,12 @@
+#ifndef CONFIGURATION_H
+#define CONFIGURATION_H
+
 /*****************************************************************************
                     INCLUDE
 *****************************************************************************/
-#include "certificates.h"
+#include <Arduino.h>
+
+//#include "certificates.h"
 
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
@@ -87,34 +92,9 @@
 /*****************************************************************************
                     TYPEDEF
 *****************************************************************************/
-class DLRObject;
-class DLRMessage;
-/*****************************************************************************
-                    TYPEDEF
-*****************************************************************************/
-typedef uint8_t error_t;
-typedef size_t  ObjectID_t;
-/*****************************************************************************
-                    VARIABLES
-*****************************************************************************/
-time_t system_boot_time = 0;
-time_t TimerTimeOffset  = 0;
+typedef uint8_t  error_t;
+typedef uint16_t ObjectID_t;
 
-std::vector< DLRObject *  > DLRObjectStack;
-/*****************************************************************************
-                    OBJECT
-*****************************************************************************/
-#include "common.h"
+extern error_t addLog( ObjectID_t ObjectID , uint16_t pri , const String fmt , ... );
 
-#include "DLRObject.hpp"
-
-#include "DLRMessages.hpp"
-typedef std::priority_queue<DLRMessage *,std::vector<DLRMessage *>,DLRMessagePriorityComparison> DLRMessagesQueue;
-DLRMessagesQueue MessagesQueue;
-
-#include "DLRMessagesManager.hpp"
-DLRMessagesQueueManager  MessagesQueueManager;
-
-#include "DLRObjectManager.hpp"
-DLRObjectManager ObjectManager;
-
+#endif // CONFIGURATION_H

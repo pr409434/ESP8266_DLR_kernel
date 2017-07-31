@@ -12,6 +12,10 @@ wifi_station_set_hostname("xxxxx");
 wifi_station_get_hostname();
 */
 #include "Configuration.h"
+#include "DLRObject.h"
+#include "DLRMessages.h"
+#include "DLRObjectManager.h"
+#include "DLRMessagesManager.h"
 
 void WiFiEvent( WiFiEvent_t event )
 {
@@ -78,7 +82,7 @@ void setup()
 	Serial.println("\n\n/*********************************************/");
 	
 	ObjectManager.main_setup();
-	addLog( 0 , LOG_DEBUG , "Start setup() -> ObjectManager.size(): %ld\n" , ObjectManager.size() );
+	//addLog( 0 , LOG_DEBUG , "Start setup() -> ObjectManager.size(): %ld\n" , ObjectManager.size() );
 	
 	WiFi.onEvent( WiFiEvent );
 
@@ -131,7 +135,7 @@ void setup()
     client.setServer( mqtt_server , 1883 ); // 9001 ); //1883 ); // 8883);
     client.setCallback(callback);
 	
-	addLog( 0 , LOG_DEBUG , "Exit setup() -> ObjectManager.size(): %ld\n" , ObjectManager.size() );
+	//addLog( 0 , LOG_DEBUG , "Exit setup() -> ObjectManager.size(): %ld\n" , ObjectManager.size() );
 }
 
 void callback(char* topic, byte* payload, unsigned int length) {
