@@ -2,7 +2,14 @@
 #include "DLRMessagesManager.h"
 
 DLRMessagesQueueManager::DLRMessagesQueueManager()
-{}	
+{
+	if( name == nullptr )
+	{
+		name = (char *) "MessaggesManager";
+	}
+	priority = 0;
+	MessagesQueueManager = this;
+}	
 DLRMessagesQueueManager::~DLRMessagesQueueManager()
 {}
 error_t DLRMessagesQueueManager::loop()
@@ -63,4 +70,4 @@ error_t DLRMessagesQueueManager::send_current_message()
 	return( 0 );
 }
 
-DLRMessagesQueueManager MessagesQueueManager;
+DLRMessagesQueueManager *MessagesQueueManager;

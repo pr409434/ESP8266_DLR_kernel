@@ -3,6 +3,7 @@
 
 #include "Configuration.h"
 
+extern ObjectID_t ObjectID_count;
 
 class DLRObject
 {

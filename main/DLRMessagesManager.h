@@ -16,6 +16,6 @@ class DLRMessagesQueueManager: public DLRObject
 		error_t send_current_message();
 };
 
-extern DLRMessagesQueueManager MessagesQueueManager;
+extern DLRMessagesQueueManager *MessagesQueueManager;
 
 #endif //DLRMessagesManager_H

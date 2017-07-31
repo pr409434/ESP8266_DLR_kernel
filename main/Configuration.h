@@ -95,6 +95,7 @@
 typedef uint8_t  error_t;
 typedef uint16_t ObjectID_t;
 
+extern String String_Format( const String fmt , ... );
 extern error_t addLog( ObjectID_t ObjectID , uint16_t pri , const String fmt , ... );
 
 #endif // CONFIGURATION_H

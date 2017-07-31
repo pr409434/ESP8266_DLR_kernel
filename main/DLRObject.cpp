@@ -9,7 +9,6 @@ DLRObject::DLRObject()
 {
 	ObjectID = ObjectID_count;
 	ObjectID_count += 1;
-	ObjectsQueue.push_back( this );
 }
 DLRObject::~DLRObject()
 {
@@ -22,6 +21,7 @@ DLRObject::~DLRObject()
 }
 error_t DLRObject::setup()
 {
+	addLog( 0 , LOG_DEBUG , "Setup: prototype\n" );
 	return( 0 );
 }
 error_t DLRObject::loop()

@@ -81,7 +81,7 @@ void setup()
 	Serial.begin( 115200 );
 	Serial.println("\n\n/*********************************************/");
 	
-	ObjectManager.main_setup();
+	
 	//addLog( 0 , LOG_DEBUG , "Start setup() -> ObjectManager.size(): %ld\n" , ObjectManager.size() );
 	
 	WiFi.onEvent( WiFiEvent );
@@ -97,13 +97,22 @@ void setup()
 		Serial.print(".");
     }
 	Serial.println();
+	Serial.println("/*********************************************/");
+
+	ObjectsQueue.push_back( new DLRMessagesQueueManager() );
+	ObjectsQueue.push_back( new DLRObjectManager() );
 	
 	addLog( 0 , LOG_DEBUG , "Connected to %s %s\n" , ssid , WiFi.localIP().toString().c_str() );
-	
+	/*******************************************
 	configTime( 2 * 3600 , 0 , // , 1 * 3600,
 				"0.pool.ntp.org",
 				"1.pool.ntp.org",
 				"2.pool.ntp.org");
+	********************************************/
+	configTime( 2 * 3600 , 0 , // , 1 * 3600,
+				"192.168.1.47",
+				"192.168.1.27",
+				"pool.ntp.org");
 	uint16_t timeout = 0;
 	time_t timestamp = time( NULL );
 	while (
@@ -119,7 +128,7 @@ void setup()
 	if( timestamp > (2017 - 1970)*(365*24*3600) ) 
 	{
 		system_boot_time = timestamp - ( millis()/1000);
-		addLog( 0 , LOG_DEBUG , "NTP on\n");
+		addLog( 0 , LOG_DEBUG , "NTP on\tcurrent time: %s\n" , ctime(&timestamp) );
 	}
 	else
 	{
@@ -134,8 +143,11 @@ void setup()
 	
     client.setServer( mqtt_server , 1883 ); // 9001 ); //1883 ); // 8883);
     client.setCallback(callback);
+
+	ObjectManager->main_setup();
+
 	
-	//addLog( 0 , LOG_DEBUG , "Exit setup() -> ObjectManager.size(): %ld\n" , ObjectManager.size() );
+	addLog( 0 , LOG_DEBUG , "Exit setup() -> ObjectQueue.size(): %ld\n" , ObjectsQueue.size() );
 }
 
 void callback(char* topic, byte* payload, unsigned int length) {
@@ -189,7 +201,7 @@ void loop()
 	}
 	yield();
 	client.loop();
-	ObjectManager.main_loop();
+	ObjectManager->main_loop();
 	long now = millis();
 	if ( now - lastMsg > 2000 )
 	{
@@ -198,24 +210,6 @@ void loop()
 		snprintf( msg, 75, "hello world #%ld", value);
 		client.publish("outTopic", msg );
 		//addLog( 0 , LOG_DEBUG , "Publish message: %s\n", msg );
-		/*
-		Serial.print("s:");
-		Serial.print( Serial.availableForWrite() );
-		Serial.println();
-		Serial.print("Publish message: ");
-		Serial.println(msg);
-		Serial.print("s:");
-		Serial.print( Serial.availableForWrite() );
-		Serial.println();
-		
-		*/
-		/*
-		Serial.print("MessagesQueue.size: ");
-		Serial.print( MessagesQueue.size() );
-		Serial.println();
-		*/
-		//Serial.println( (String_Format( "B_MessagesQueue.size: %d" , MessagesQueue.size() )).c_str() );
-		//addLog( 0 , LOG_DEBUG , "#%ld\tMessagesQueue.size: %ld\n" , value , MessagesQueue.size() );
 	}
 }
 

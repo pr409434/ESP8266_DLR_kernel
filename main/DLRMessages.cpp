@@ -45,18 +45,6 @@ bool DLRMessagePriorityComparison::operator() ( DLRMessage * lhs , DLRMessage * 
 {
 	if ( reverse )
 	{
-		if( LOG_PRI( lhs->SysLog_Code ) >  LOG_PRI( rhs->SysLog_Code ) )
-		{
-			return( true );
-		}
-		else if( LOG_PRI( lhs->SysLog_Code ) == LOG_PRI( rhs->SysLog_Code ) )
-		{
-			return( lhs->Number > rhs->Number );
-		}
-		return( false );
-	}
-	else
-	{
 		if( LOG_PRI( lhs->SysLog_Code ) <  LOG_PRI( rhs->SysLog_Code ) )
 		{
 			return( true );
@@ -64,6 +52,18 @@ bool DLRMessagePriorityComparison::operator() ( DLRMessage * lhs , DLRMessage * 
 		else if( LOG_PRI( lhs->SysLog_Code ) == LOG_PRI( rhs->SysLog_Code ) )
 		{
 			return( lhs->Number < rhs->Number );
+		}
+		return( false );
+	}
+	else
+	{
+		if( LOG_PRI( lhs->SysLog_Code ) >  LOG_PRI( rhs->SysLog_Code ) )
+		{
+			return( true );
+		}
+		else if( LOG_PRI( lhs->SysLog_Code ) == LOG_PRI( rhs->SysLog_Code ) )
+		{
+			return( lhs->Number > rhs->Number );
 		}
 		return( false );
 	}
