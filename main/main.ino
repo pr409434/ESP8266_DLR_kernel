@@ -129,12 +129,12 @@ void setup()
 	{
 		system_boot_time = timestamp - ( millis()/1000);
 		addLog( 0 , LOG_DEBUG , "NTP on\tcurrent time: %s\n" , ctime(&timestamp) );
+		addLog( 0 , LOG_DEBUG , "system_boot_time: %s\n" , ctime(&system_boot_time) );
 	}
 	else
 	{
 		addLog( 0 , LOG_DEBUG , "NTP off\n");
 	}
-	
 	addLog( 0 , LOG_DEBUG , "ESP8266 SDK Version: %s\n" , ESP.getSdkVersion() );
 	
 	//espClient.setCACert(ca_crt, ca_crt_len);

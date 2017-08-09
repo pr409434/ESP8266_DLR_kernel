@@ -3,7 +3,7 @@
 
 #include "Configuration.h"
 
-extern time_t system_boot_time;
+//extern static time_t system_boot_time;
 
 class DLRMessage
 {

@@ -1,15 +1,21 @@
 
 #include "DLRMessages.h"
 
-static uint32_t DLRMessageCounter = 0;
-time_t system_boot_time = 0;
-time_t TimerTimeOffset  = 0;
+static uint32_t  DLRMessageCounter = 0;
+static time_t    system_boot_time  = 0;
+static time_t    TimerTimeOffset   = 0;
+static uint32_t _DLRMessageLastMicroTimeStamp  = 0;
 
 DLRMessage::DLRMessage( ObjectID_t ObjectID , uint16_t pri , const char *message )
 {
 	DLRMessageCounter +=1;
 	Number = DLRMessageCounter;
-	
+	uint32_t _TimeMicroStamp = millis();
+	if( _DLRMessageLastMicroTimeStamp > _TimeMicroStamp )
+	{
+		TimerTimeOffset += 1;
+	}
+	_DLRMessageLastMicroTimeStamp = _TimeMicroStamp;
 	microSecond = micros() % 1000000;
 	timestamp   = ( millis() / 1000 ) + TimerTimeOffset;
 	
