@@ -3,6 +3,18 @@
 
 #include "Configuration.h"
 
+uint64_t microtimes()
+{
+	uint64_t _TimeMicroStamp = micros();
+	if ( LastMicroTimeStamp > _TimeMicroStamp )
+	{
+		MicroTimeStampTimeOffset += 1;
+		LastMicroTimeStamp = _TimeMicroStamp;
+	}
+	uint64_t microtimestamp = ( MicroTimeStampTimeOffset << 32 ) + _TimeMicroStamp;
+	return( microtimestamp );
+}
+
 std::string string_format(const std::string fmt, ...) {
     int size = ((int)fmt.size()) * 2 + 50;   // Use a rubric appropriate for your code
     std::string str;

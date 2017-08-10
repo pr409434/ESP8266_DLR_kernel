@@ -10,7 +10,7 @@
 
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
-
+#include "Countdown.h"
 #include <time.h>
 #include <stdint.h>
 #include <stdarg.h>
@@ -95,6 +95,13 @@
 typedef uint8_t  error_t;
 typedef uint16_t ObjectID_t;
 
+/*****************************************************************************/
+extern time_t    system_boot_time;
+extern uint64_t  MicroTimeStampTimeOffset;
+extern uint64_t  LastMicroTimeStamp;
+
+extern uint64_t microtimes();
+/*****************************************************************************/
 extern String String_Format( const String fmt , ... );
 extern error_t addLog( ObjectID_t ObjectID , uint16_t pri , const String fmt , ... );
 

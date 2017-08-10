@@ -3,14 +3,13 @@
 
 #include "Configuration.h"
 
-//extern static time_t system_boot_time;
 
 class DLRMessage
 {
 	public:
 		uint32_t    Number = 0;
-		time_t      timestamp = 0;
-		uint32_t	microSecond = 0;
+
+		uint64_t	microtimestamp = 0;
 		
 		ObjectID_t  from_ObjectID;
 		uint16_t    SysLog_Code;

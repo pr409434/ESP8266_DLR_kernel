@@ -35,7 +35,12 @@ error_t DLRObjectManager::main_loop()
 	for ( std::vector<DLRObject *>::iterator it=ObjectsQueue.begin(); it!=ObjectsQueue.end(); ++it )
 	{
 		yield();
+
+		uint64_t microtimestamp = microtimes();
+
 		(*it)->loop();
+
+		uint64_t elapsed_microtimes = microtimes() - microtimestamp;
 	}
 	return( 0 );
 }
@@ -58,6 +63,7 @@ error_t DLRObjectManager::setup()
 	addLog( 0 , LOG_DEBUG , "Setup: DLRObjectManager\n" );
 	return( 0 );
 }
+
 time_t _last_timestamp = 0;
 error_t DLRObjectManager::loop()
 {

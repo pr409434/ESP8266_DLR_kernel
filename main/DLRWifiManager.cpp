@@ -1,5 +1,17 @@
 #include "DLRWifiManager.h"
 
+
+
+#include "local/id_local.h"
+/***********************************************
+    Content: id_local.h
+************************************************
+const char* ssid        = "................";
+const char* password    = "................";
+const char* mqtt_server = "................";
+***********************************************/
+
+
 void WiFiEvent( WiFiEvent_t event )
 {
 	switch( event )
@@ -41,34 +53,59 @@ void WiFiEvent( WiFiEvent_t event )
 	}
 }
 
-
+DLRWifiManager::DLRWifiManager()
+{
+	if( name == nullptr )
+	{
+		name = (char *) "WifiManager";
+	}
+	priority = 0;
+}	
+DLRWifiManager::~DLRWifiManager()
+{
+	
+}
 
 error_t DLRWifiManager::setup()
 {
 	WiFi.onEvent( WiFiEvent );
-
+	// sNTP config
+	configTime( 2 * 3600 , 0 , // , 1 * 3600,
+				"192.168.1.47",
+				"192.168.1.27",
+				"pool.ntp.org");
 	// Connect to WiFi network
 	WiFi.begin( ssid , password );
 
     // Wait for connection
-	while ( WiFi.status() != WL_CONNECTED )
-	{
-		delay(500);
-		Serial.print(".");
-    }
+	_timer_reconnect.countdown( 30 ); // 30 seconds
 }
 
 error_t DLRWifiManager::loop()
 {
-	/*
-	if(!client.connected())
+	if( WiFi.status() != WL_CONNECTED )
 	{
-		reconnect();
+		if( _timer_reconnect.expired() )
+		{
+			WiFi.reconnect();
+			_timer_reconnect.countdown( 30 );
+		}
+	} else
+	{
+		if ( system_boot_time == 0 )
+		{
+			time_t _actual_timestamp = time( NULL );
+			if( _actual_timestamp > (2017 - 1970)*(365*24*3600) ) 
+			{
+				system_boot_time = _actual_timestamp - ( millis()/1000);
+				addLog( 0 , LOG_DEBUG , "NTP on\tcurrent time: %s\n" , ctime(&_actual_timestamp) );
+				addLog( 0 , LOG_DEBUG , "system_boot_time: %s\n" , ctime(&system_boot_time) );
+			}
+		}
 	}
-	*/
 }
 
-error_t DLRWifiManager:reconnect()
+error_t DLRWifiManager::reconnect_STA()
 {
 	/*
 	while(!client.connected())
