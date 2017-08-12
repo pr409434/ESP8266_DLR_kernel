@@ -1,3 +1,11 @@
+#include "local/id_local.h"
+/***********************************************
+    Content: id_local.h
+************************************************
+const char* ssid        = "................";
+const char* password    = "................";
+const char* mqtt_server = "................";
+***********************************************/
 
 
 /*
@@ -10,48 +18,34 @@ wifi_station_get_hostname();
 #include "DLRObjectManager.h"
 #include "DLRMessagesManager.h"
 #include "DLRWifiManager.h"
+#include "DLRMQTT.h"
 
-
-
-
-WiFiClient espClient;
-//WiFiClientSecure espClient;
-PubSubClient client( espClient );
-
-
-
-
-long lastMsg = 0;
-char msg[50];
-int value = 0;
 
 
 time_t   system_boot_time         = 0;
 uint64_t MicroTimeStampTimeOffset = 0;
 uint64_t LastMicroTimeStamp       = micros();
 
-void setup()
+void ICACHE_FLASH_ATTR setup()
 {
 	Serial.begin( 115200 );
 	Serial.println("\n\n/*********************************************/");
-	Serial.println();
+	Serial.println(ESP.getSketchMD5());
+	Serial.println("/*********************************************/");			
+	Serial.println(ESP.getResetInfo());
+	Serial.println(ESP.getResetReason());
 	Serial.println("/*********************************************/");
 
 	ObjectsQueue.push_back( new DLRMessagesQueueManager() );
 	ObjectsQueue.push_back( new DLRObjectManager() );
 	ObjectsQueue.push_back( new DLRWifiManager() );
-	
-	//espClient.setCACert(ca_crt, ca_crt_len);
-    //espClient.setCertificate(dlr_000_crt, dlr_000_crt_len);
-    //espClient.setPrivateKey(dlr_000_key, dlr_000_key_len);
-    //client.setServer( mqtt_server , 1883 ); // 9001 ); //1883 ); // 8883);
-    //client.setCallback(callback);
+	ObjectsQueue.push_back( new DLRMQTT() );
 
 	ObjectManager->main_setup();
 	addLog( 0 , LOG_DEBUG , "Exit setup() -> ObjectQueue.size(): %ld\n" , ObjectsQueue.size() );
 }
 
-void callback(char* topic, byte* payload, unsigned int length) {
+void ICACHE_FLASH_ATTR callback(char* topic, byte* payload, unsigned int length) {
 	Serial.print("Message arrived [");
 	Serial.print(topic);
 	Serial.print("] ");
@@ -73,12 +67,12 @@ void callback(char* topic, byte* payload, unsigned int length) {
 }
 
 
-void reconnect() {
+void ICACHE_FLASH_ATTR reconnect() {
 	/*
     while(!client.connected())
 	{
 		addLog( 0 , LOG_DEBUG , "Attempting MQTT connection...\n");
-        if( client.connect("dlr_000", "dlr", "dragon"))
+        if( client.connect("dlr_000", ))
 		{
 			addLog( 0 , LOG_DEBUG , "MQTT connected to: %s\n" , mqtt_server );
             // Resubscribe to all your topics here so that they are
@@ -95,7 +89,7 @@ void reconnect() {
 }
 
 
-void loop()
+void ICACHE_FLASH_ATTR loop()
 {
 	ObjectManager->main_loop();
 

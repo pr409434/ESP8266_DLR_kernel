@@ -9,13 +9,17 @@
 //#include "certificates.h"
 
 #include <ESP8266WiFi.h>
+
+#define MQTT_MAX_PACKET_SIZE 512
 #include <PubSubClient.h>
+
 #include "Countdown.h"
 #include <time.h>
 #include <stdint.h>
 #include <stdarg.h>
 #include <inttypes.h>
 #include <WString.h>
+#include <cstring>
 #include <string>
 #include <vector>
 #include <list>
@@ -95,6 +99,14 @@
 typedef uint8_t  error_t;
 typedef uint16_t ObjectID_t;
 
+
+/*****************************************************************************/
+extern const char* ssid;
+extern const char* password;
+/*****************************************************************************/
+extern const char* mqtt_server;
+extern const char* mqtt_username;
+extern const char* mqtt_password;
 /*****************************************************************************/
 extern time_t    system_boot_time;
 extern uint64_t  MicroTimeStampTimeOffset;
@@ -104,5 +116,6 @@ extern uint64_t microtimes();
 /*****************************************************************************/
 extern String String_Format( const String fmt , ... );
 extern error_t addLog( ObjectID_t ObjectID , uint16_t pri , const String fmt , ... );
+extern error_t mqtt_publish( uint16_t pri , const char* topic , const String fmt , ... );
 
 #endif // CONFIGURATION_H

@@ -3,7 +3,7 @@
 
 #include "Configuration.h"
 
-uint64_t microtimes()
+uint64_t ICACHE_FLASH_ATTR microtimes()
 {
 	uint64_t _TimeMicroStamp = micros();
 	if ( LastMicroTimeStamp > _TimeMicroStamp )
@@ -15,7 +15,7 @@ uint64_t microtimes()
 	return( microtimestamp );
 }
 
-std::string string_format(const std::string fmt, ...) {
+std::string ICACHE_FLASH_ATTR string_format(const std::string fmt, ...) {
     int size = ((int)fmt.size()) * 2 + 50;   // Use a rubric appropriate for your code
     std::string str;
     va_list ap;
@@ -37,7 +37,7 @@ std::string string_format(const std::string fmt, ...) {
 }
 
 //std::string string_format(const std::string fmt, ...)
-String String_Format( const String fmt , ... )
+String ICACHE_FLASH_ATTR String_Format( const String fmt , ... )
 {
 	int size = ( (int) fmt.length() ) + 32; //* 2 + 50;   // Use a rubric appropriate for your code
 	String str;

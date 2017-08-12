@@ -1,7 +1,7 @@
 
 #include "DLRMessagesManager.h"
 
-DLRMessagesQueueManager::DLRMessagesQueueManager()
+ICACHE_FLASH_ATTR DLRMessagesQueueManager::DLRMessagesQueueManager()
 {
 	if( name == nullptr )
 	{
@@ -10,9 +10,9 @@ DLRMessagesQueueManager::DLRMessagesQueueManager()
 	priority = 0;
 	MessagesQueueManager = this;
 }	
-DLRMessagesQueueManager::~DLRMessagesQueueManager()
+ICACHE_FLASH_ATTR DLRMessagesQueueManager::~DLRMessagesQueueManager()
 {}
-error_t DLRMessagesQueueManager::loop()
+error_t ICACHE_FLASH_ATTR DLRMessagesQueueManager::loop()
 {
 	if ( current_message_size <= 0 )
 	{
@@ -37,7 +37,7 @@ error_t DLRMessagesQueueManager::loop()
 	return( 0 );
 }
 
-error_t DLRMessagesQueueManager::send_current_message()
+error_t ICACHE_FLASH_ATTR DLRMessagesQueueManager::send_current_message()
 {
 	if ( Serial )
 	{

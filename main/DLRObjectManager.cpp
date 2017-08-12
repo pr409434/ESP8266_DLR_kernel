@@ -2,7 +2,7 @@
 #include "DLRObjectManager.h"
 
 
-DLRObjectManager::DLRObjectManager()
+ICACHE_FLASH_ATTR DLRObjectManager::DLRObjectManager()
 {
 	if( name == nullptr )
 	{
@@ -11,17 +11,17 @@ DLRObjectManager::DLRObjectManager()
 	priority = 0;
 	ObjectManager = this;
 }
-DLRObjectManager::~DLRObjectManager()
+ICACHE_FLASH_ATTR DLRObjectManager::~DLRObjectManager()
 {}
-error_t DLRObjectManager::status()
+error_t ICACHE_FLASH_ATTR DLRObjectManager::status()
 {
 	return( 0 );
 }
-uint16_t size()
+uint16_t ICACHE_FLASH_ATTR size()
 {
 	return( ObjectsQueue.size() );
 }
-error_t DLRObjectManager::main_setup()
+error_t ICACHE_FLASH_ATTR DLRObjectManager::main_setup()
 {
 	for ( std::vector<DLRObject *>::iterator it=ObjectsQueue.begin(); it!=ObjectsQueue.end(); ++it )
 	{
@@ -30,7 +30,7 @@ error_t DLRObjectManager::main_setup()
 	}
 	return( 0 );
 }
-error_t DLRObjectManager::main_loop()
+error_t ICACHE_FLASH_ATTR DLRObjectManager::main_loop()
 {
 	for ( std::vector<DLRObject *>::iterator it=ObjectsQueue.begin(); it!=ObjectsQueue.end(); ++it )
 	{
@@ -44,7 +44,7 @@ error_t DLRObjectManager::main_loop()
 	}
 	return( 0 );
 }
-error_t DLRObjectManager::ObjectList()
+error_t ICACHE_FLASH_ATTR DLRObjectManager::ObjectList()
 {
 	String list( name );
 	list += ".ObjectList:\n";
@@ -58,14 +58,14 @@ error_t DLRObjectManager::ObjectList()
 	}
 	addLog( ObjectID , LOG_INFO , list.c_str() );
 }
-error_t DLRObjectManager::setup()
+error_t ICACHE_FLASH_ATTR DLRObjectManager::setup()
 {
 	addLog( 0 , LOG_DEBUG , "Setup: DLRObjectManager\n" );
 	return( 0 );
 }
 
 time_t _last_timestamp = 0;
-error_t DLRObjectManager::loop()
+error_t ICACHE_FLASH_ATTR DLRObjectManager::loop()
 {
 	time_t _timestamp = millis();
 	if( _last_timestamp > _timestamp )

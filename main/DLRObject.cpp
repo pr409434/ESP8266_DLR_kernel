@@ -5,12 +5,12 @@
 ObjectID_t ObjectID_count = 0;
 
 
-DLRObject::DLRObject()
+ICACHE_FLASH_ATTR DLRObject::DLRObject()
 {
 	ObjectID = ObjectID_count;
 	ObjectID_count += 1;
 }
-DLRObject::~DLRObject()
+ICACHE_FLASH_ATTR DLRObject::~DLRObject()
 {
 	//  DLRObjectStack[ObjectID] = nullptr;
 	//	DLRObjectStack[ObjectID] = nullptr;
@@ -19,16 +19,16 @@ DLRObject::~DLRObject()
 		delete name;
 	}
 }
-error_t DLRObject::setup()
+error_t ICACHE_FLASH_ATTR DLRObject::setup()
 {
 	addLog( 0 , LOG_DEBUG , "Setup: prototype\n" );
 	return( 0 );
 }
-error_t DLRObject::loop()
+error_t ICACHE_FLASH_ATTR DLRObject::loop()
 {
 	return( 0 );
 }
-error_t DLRObject::status()
+error_t ICACHE_FLASH_ATTR DLRObject::status()
 {
 	return( 0 );
 }
@@ -39,11 +39,11 @@ virtual error_t DLRObject::message_handler( DLRMessage *message )
 }
 */
 
-DLRObjectComparison::DLRObjectComparison( const bool& revparam = false )
+ICACHE_FLASH_ATTR DLRObjectComparison::DLRObjectComparison( const bool& revparam = false )
 {
 	reverse = revparam;
 }
-bool DLRObjectComparison::operator() ( DLRObject * lhs , DLRObject * rhs )
+bool ICACHE_FLASH_ATTR DLRObjectComparison::operator() ( DLRObject * lhs , DLRObject * rhs )
 {
 	if ( reverse )
 	{

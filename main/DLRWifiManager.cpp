@@ -1,18 +1,21 @@
 #include "DLRWifiManager.h"
 
+		/*
+        WiFiEventHandler onStationModeConnected(std::function<void(const WiFiEventStationModeConnected&)>);
+        WiFiEventHandler onStationModeDisconnected(std::function<void(const WiFiEventStationModeDisconnected&)>);
+        WiFiEventHandler onStationModeAuthModeChanged(std::function<void(const WiFiEventStationModeAuthModeChanged&)>);
+        WiFiEventHandler onStationModeGotIP(std::function<void(const WiFiEventStationModeGotIP&)>);
+        WiFiEventHandler onStationModeDHCPTimeout(std::function<void(void)>);
+        WiFiEventHandler onSoftAPModeStationConnected(std::function<void(const WiFiEventSoftAPModeStationConnected&)>);
+        WiFiEventHandler onSoftAPModeStationDisconnected(std::function<void(const WiFiEventSoftAPModeStationDisconnected&)>);
+        WiFiEventHandler onSoftAPModeProbeRequestReceived(std::function<void(const WiFiEventSoftAPModeProbeRequestReceived&)>);
+		// WiFiEventHandler onWiFiModeChange(std::function<void(const WiFiEventModeChange&)>);
+		
+		setOutputPower(float dBm);
+		bool mode(WiFiMode_t); WIFI_PHY_MODE_11B = 1, WIFI_PHY_MODE_11G = 2, WIFI_PHY_MODE_11N = 3
+		*/
 
-
-#include "local/id_local.h"
-/***********************************************
-    Content: id_local.h
-************************************************
-const char* ssid        = "................";
-const char* password    = "................";
-const char* mqtt_server = "................";
-***********************************************/
-
-
-void WiFiEvent( WiFiEvent_t event )
+void ICACHE_FLASH_ATTR WiFiEvent( WiFiEvent_t event )
 {
 	switch( event )
 	{
@@ -53,7 +56,7 @@ void WiFiEvent( WiFiEvent_t event )
 	}
 }
 
-DLRWifiManager::DLRWifiManager()
+ICACHE_FLASH_ATTR DLRWifiManager::DLRWifiManager()
 {
 	if( name == nullptr )
 	{
@@ -61,12 +64,12 @@ DLRWifiManager::DLRWifiManager()
 	}
 	priority = 0;
 }	
-DLRWifiManager::~DLRWifiManager()
+ICACHE_FLASH_ATTR DLRWifiManager::~DLRWifiManager()
 {
 	
 }
 
-error_t DLRWifiManager::setup()
+error_t ICACHE_FLASH_ATTR DLRWifiManager::setup()
 {
 	WiFi.onEvent( WiFiEvent );
 	// sNTP config
@@ -78,20 +81,25 @@ error_t DLRWifiManager::setup()
 	WiFi.begin( ssid , password );
 
     // Wait for connection
-	_timer_reconnect.countdown( 30 ); // 30 seconds
+	_timer_reconnect.countdown( 5 ); // 30 seconds
+	_timer_module_info.countdown( 10 );
 }
 
-error_t DLRWifiManager::loop()
+error_t ICACHE_FLASH_ATTR DLRWifiManager::loop()
 {
 	if( WiFi.status() != WL_CONNECTED )
 	{
 		if( _timer_reconnect.expired() )
 		{
 			WiFi.reconnect();
-			_timer_reconnect.countdown( 30 );
+			_timer_reconnect.countdown( 5 );
 		}
 	} else
 	{
+		if( _timer_module_info.expired() )
+		{
+			module_info();
+		}
 		if ( system_boot_time == 0 )
 		{
 			time_t _actual_timestamp = time( NULL );
@@ -105,7 +113,21 @@ error_t DLRWifiManager::loop()
 	}
 }
 
-error_t DLRWifiManager::reconnect_STA()
+
+error_t ICACHE_FLASH_ATTR DLRWifiManager::module_info()
+{
+	addLog( 0 , LOG_DEBUG , "DLRWifiManager::module_info()...\n" );
+	mqtt_publish( LOG_NOTICE , "Wifi" 
+					, "{\"SSID:\":\"%s\",\"BSSID\":\"%s\",\"RSSI\":%d,\"channel\":%d}"
+					, WiFi.SSID().c_str()
+					, WiFi.BSSIDstr().c_str()
+					, WiFi.RSSI()
+					, WiFi.channel()
+				);
+	_timer_module_info.countdown( 10 );
+}
+
+error_t ICACHE_FLASH_ATTR DLRWifiManager::reconnect_STA()
 {
 	/*
 	while(!client.connected())

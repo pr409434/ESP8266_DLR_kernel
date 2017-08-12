@@ -4,7 +4,7 @@
 static uint32_t  DLRMessageCounter = 0;
 
 
-DLRMessage::DLRMessage( ObjectID_t ObjectID , uint16_t pri , const char *message )
+ICACHE_FLASH_ATTR DLRMessage::DLRMessage( ObjectID_t ObjectID , uint16_t pri , const char *message )
 {
 	DLRMessageCounter +=1;
 	Number         = DLRMessageCounter;
@@ -14,15 +14,15 @@ DLRMessage::DLRMessage( ObjectID_t ObjectID , uint16_t pri , const char *message
 	
 	size_t message_size = strlen( message );
 	payload = new char[ message_size +1 ];
-	strncpy( payload , message , message_size );
+	std::memcpy( payload , message , message_size );
 	payload[message_size] = 0;
 }
-DLRMessage::DLRMessage()
+ICACHE_FLASH_ATTR DLRMessage::DLRMessage()
 {
 	DLRMessageCounter +=1;
 	Number = DLRMessageCounter;
 }
-DLRMessage::~DLRMessage()
+ICACHE_FLASH_ATTR DLRMessage::~DLRMessage()
 {
 	if( payload != nullptr )
 	{
@@ -31,11 +31,11 @@ DLRMessage::~DLRMessage()
 }
 
 
-DLRMessagePriorityComparison::DLRMessagePriorityComparison( const bool& revparam = false )
+ICACHE_FLASH_ATTR DLRMessagePriorityComparison::DLRMessagePriorityComparison( const bool& revparam = false )
 {
 	reverse=revparam;
 }
-bool DLRMessagePriorityComparison::operator() ( DLRMessage * lhs , DLRMessage * rhs )
+bool ICACHE_FLASH_ATTR DLRMessagePriorityComparison::operator() ( DLRMessage * lhs , DLRMessage * rhs )
 {
 	if ( reverse )
 	{
@@ -69,7 +69,7 @@ DLRMessagesQueue MessagesQueue;
 MessagesQueue.push( new DLRMessage( ObjectID , pri , message ) );
 */
 
-error_t addLog( ObjectID_t ObjectID , uint16_t pri , const String fmt , ... )
+error_t ICACHE_FLASH_ATTR addLog( ObjectID_t ObjectID , uint16_t pri , const String fmt , ... )
 {
 	int size = ( (int) fmt.length() ) + 32; //* 2 + 50;   // Use a rubric appropriate for your code
 	String str;

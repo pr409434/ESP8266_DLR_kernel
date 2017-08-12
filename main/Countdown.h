@@ -20,32 +20,32 @@
 class Countdown
 {
 public:
-    Countdown()
+    ICACHE_FLASH_ATTR Countdown()
     {  
 		interval_end_ms = 0L;
     }
     
-    Countdown(int ms)
+    ICACHE_FLASH_ATTR Countdown(int ms)
     {
         countdown_ms(ms);   
     }
     
-    bool expired()
+    bool ICACHE_FLASH_ATTR expired()
     {
         return (interval_end_ms > 0L) && (millis() >= interval_end_ms);
     }
     
-    void countdown_ms(unsigned long ms)  
+    void ICACHE_FLASH_ATTR countdown_ms(unsigned long ms)  
     {
         interval_end_ms = millis() + ms;
     }
     
-    void countdown(int seconds)
+    void ICACHE_FLASH_ATTR countdown(int seconds)
     {
         countdown_ms((unsigned long)seconds * 1000L);
     }
     
-    int left_ms()
+    int ICACHE_FLASH_ATTR left_ms()
     {
         return interval_end_ms - millis();
     }

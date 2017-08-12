@@ -12,8 +12,12 @@ class DLRWifiManager: public DLRObject
 		error_t setup();
 		
 		error_t reconnect_STA();
+		
+		error_t module_info();
+		
 	private:
 		Countdown _timer_reconnect;
+		Countdown _timer_module_info;
 };
 
 #endif //DLRWifiManager_H
