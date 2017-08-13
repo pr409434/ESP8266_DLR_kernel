@@ -70,10 +70,14 @@ ICACHE_FLASH_ATTR DLRMQTT::~DLRMQTT()
 
 error_t ICACHE_FLASH_ATTR DLRMQTT::loop()
 {
+	
 	if( _mqtt_client->loop() )
 	{
 		size_t _tcp_Client_size = _tcp_Client->availableForWrite();
-		if ( _tcp_Client_size >= 2900 )
+		if (
+				   ( _tcp_Client_size >= 2900 )
+				&& ( _timer_mqtt_send.expired() )
+			)
 		{
 			if( ! MQTTMessagesQueue.empty() )
 			{
@@ -83,6 +87,7 @@ error_t ICACHE_FLASH_ATTR DLRMQTT::loop()
 									 );
 				delete MQTTMessagesQueue.top();
 				MQTTMessagesQueue.pop();
+				_timer_mqtt_send.countdown_ms( 500 );
 			}
 		}
 	} else
@@ -120,6 +125,7 @@ error_t ICACHE_FLASH_ATTR DLRMQTT::reconnect()
             // Resubscribe to all your topics here so that they are
             // resubscribed each time you reconnect
 			_mqtt_client->subscribe("inTopic");
+			_timer_mqtt_send.countdown( 5 );
         } else {
 			addLog( 0 , LOG_DEBUG , "failed, rc=%d retry again in 10 seconds\n" , _mqtt_client->state() );
 			_timer_reconnect.countdown( 10 ); // 30 seconds

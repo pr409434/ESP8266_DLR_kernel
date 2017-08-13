@@ -27,7 +27,9 @@ class DLRMQTT: public DLRObject
 		
 		Countdown _timer_module_info;
 	
-		Countdown     _timer_reconnect;
+		Countdown _timer_reconnect;
+		Countdown _timer_mqtt_send;
+
 		WiFiClient*   _tcp_Client; //WiFiClientSecure _tcp_Client;
 		PubSubClient* _mqtt_client;
 		

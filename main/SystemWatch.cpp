@@ -54,24 +54,31 @@ error_t ICACHE_FLASH_ATTR DLRSystemWatch::loop()
 
 error_t ICACHE_FLASH_ATTR DLRSystemWatch::module_info()
 {
+	uint32_t delay_ms = 10 * 1000;
 	time_t timestamp = time( NULL );
+	int32_t elapsed_ms = delay_ms - _timer_module_info.left_ms();
+	float LoopSecond = (1000.0f*((float)( _loop_count - last_loop_count ))) / elapsed_ms ;
+	last_loop_count  = _loop_count;
+	
 	addLog( ObjectID , LOG_NOTICE ,
-			"{\"timestamp\":%ld,\"uptime\":%ld,\"FreeHeap\":%ld,\"FreeSketchSpace\":%ld,\"CpuFreqMHz\":%d}\n"
+			"{\"timestamp\":%ld,\"uptime\":%ld,\"LoopSecond\":%0.2f,\"FreeHeap\":%ld,\"FreeSketchSpace\":%ld,\"CpuFreqMHz\":%d}\n"
 				, timestamp
 				, timestamp - system_boot_time
+				, LoopSecond
 				, ESP.getFreeHeap()
 				, ESP.getFreeSketchSpace()
 				, ESP.getCpuFreqMHz()
 				);
 	mqtt_publish( LOG_NOTICE , "sysinfo" ,
-			"{\"timestamp\":%ld,\"uptime\":%ld,\"FreeHeap\":%ld,\"FreeSketchSpace\":%ld,\"CpuFreqMHz\":%d}"
+			"{\"timestamp\":%ld,\"uptime\":%ld,\"LoopSecond\":%0.2f,\"FreeHeap\":%ld,\"FreeSketchSpace\":%ld,\"CpuFreqMHz\":%d}"
 				, timestamp
 				, timestamp - system_boot_time
+				, LoopSecond
 				, ESP.getFreeHeap()
 				, ESP.getFreeSketchSpace()
 				, ESP.getCpuFreqMHz()
 				);
-	_timer_module_info.countdown( 10 );
+	_timer_module_info.countdown_ms( delay_ms );
 	return( 0 );
 }
 

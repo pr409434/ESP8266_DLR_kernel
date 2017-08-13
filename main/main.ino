@@ -20,6 +20,7 @@ wifi_station_get_hostname();
 #include "DLRMessagesManager.h"
 #include "DLRWifiManager.h"
 #include "DLRMQTT.h"
+#include "DLRSensorDHT22.h"
 
 
 
@@ -42,6 +43,7 @@ void ICACHE_FLASH_ATTR setup()
 	ObjectsQueue.push_back( new DLRObjectManager() );
 	ObjectsQueue.push_back( new DLRWifiManager() );
 	ObjectsQueue.push_back( new DLRMQTT() );
+	ObjectsQueue.push_back( new DLRSensorDHT22() );
 
 	ObjectManager->main_setup();
 	addLog( 0 , LOG_DEBUG , "Exit setup() -> ObjectQueue.size(): %ld\n" , ObjectsQueue.size() );

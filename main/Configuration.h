@@ -18,6 +18,7 @@
 #include <stdint.h>
 #include <stdarg.h>
 #include <inttypes.h>
+#include <math.h>
 #include <WString.h>
 #include <cstring>
 #include <string>

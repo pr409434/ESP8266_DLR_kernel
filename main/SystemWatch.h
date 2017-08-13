@@ -17,6 +17,7 @@ class DLRSystemWatch: public DLRObject
 		const DLRObjectsQueue* _WatchingObjectsQueue;
 		uint64_t _last_microtimestamp = 0;
 		uint64_t _loop_count = 0;
+		uint64_t last_loop_count = 0;
 		Countdown _timer_module_info;
 		String _bootinfo;
 };
