@@ -70,60 +70,37 @@ ICACHE_FLASH_ATTR DLRMQTT::~DLRMQTT()
 
 error_t ICACHE_FLASH_ATTR DLRMQTT::loop()
 {
-	/*
-	if (
-			   (   WiFi.status() == WL_CONNECTED )
-			&& ( ! _mqtt_client->connected() )
-			&& (   _timer_reconnect.expired() )
-		)
-	{
-		reconnect();
-	}
-	if (
-			   (   WiFi.status() == WL_CONNECTED )
-			&& (   _mqtt_client->connected() )
-			&& (   _timer_sysinfo.expired() )
-		)
-	{
-		this->sysinfo();
-	}
-	*/
 	if( _mqtt_client->loop() )
 	{
 		size_t _tcp_Client_size = _tcp_Client->availableForWrite();
 		if ( _tcp_Client_size >= 2900 )
 		{
-			//addLog( 0 , LOG_DEBUG , "DLRMQTT availableForWrite: %ld\n" , _tcp_Client_size );
 			if( ! MQTTMessagesQueue.empty() )
 			{
-				addLog( 0 , LOG_DEBUG , "_mqtt_client->publish...\n" );
 				_mqtt_client->publish( MQTTMessagesQueue.top()->topic.c_str() ,
-									   MQTTMessagesQueue.top()->payload.text
+									   (uint8_t*) MQTTMessagesQueue.top()->payload.text ,
+									   (uint8_t)  MQTTMessagesQueue.top()->lenght
 									 );
 				delete MQTTMessagesQueue.top();
 				MQTTMessagesQueue.pop();
 			}
-			/*
-			if (   _timer_sysinfo.expired() )
-			{
-				this->sysinfo();
-				addLog( 0 , LOG_DEBUG , "DLRMQTT availableForWrite: %ld to %ld\n"
-						, _tcp_Client_size
-						, _tcp_Client_size - _tcp_Client->availableForWrite()
-						);
-			}
-			*/
 		}
 	} else
 	{
 		reconnect();
 	}
+	if( _timer_module_info.expired() )
+	{
+		module_info();
+	}
+	return( 0 );
 }
 
 error_t ICACHE_FLASH_ATTR DLRMQTT::setup()
 {
 	_timer_reconnect.countdown( 10 );
-	_timer_sysinfo.countdown( 60 );
+	_timer_module_info.countdown( 60 );
+	return( 0 );
 }
 
 error_t ICACHE_FLASH_ATTR DLRMQTT::reconnect()
@@ -139,80 +116,21 @@ error_t ICACHE_FLASH_ATTR DLRMQTT::reconnect()
         if( _mqtt_client->connect ( WiFi.hostname().c_str() , username.c_str(), password.c_str() ) )
 		{
 			addLog( 0 , LOG_DEBUG , "%s connected to: %s\n" , name , server.c_str() );
+			this->module_info();
             // Resubscribe to all your topics here so that they are
             // resubscribed each time you reconnect
-			//_mqtt_client->publish("outTopic", "hello world");
-			this->sysinfo();
 			_mqtt_client->subscribe("inTopic");
         } else {
 			addLog( 0 , LOG_DEBUG , "failed, rc=%d retry again in 10 seconds\n" , _mqtt_client->state() );
 			_timer_reconnect.countdown( 10 ); // 30 seconds
         }
     }
+	return( 0 );
 }
-error_t ICACHE_FLASH_ATTR DLRMQTT::sysinfo()
+error_t ICACHE_FLASH_ATTR DLRMQTT::module_info()
 {
-	time_t timestamp = time( NULL );
-	_mqtt_client->publish( String_Format( "/%s/sysinfo" , WiFi.hostname().c_str() ).c_str() ,
-						   String_Format( "{\"timestamp\":%ld,\"uptime\":%ld,\"getFreeHeap\":%ld}"
-											, timestamp
-											, timestamp - system_boot_time
-											, ESP.getFreeHeap()
-											).c_str()
-							);
-	/*
-		ESP.getSketchMD5()
-        uint32_t getSketchSize();
-        String getSketchMD5();
-        uint32_t getFreeSketchSpace();
+	_timer_module_info.countdown( 60 );
+	return( 0 );
+}
 
-		String getResetReason();
-        String getResetInfo();
-	*/
-	_mqtt_client->publish( String_Format( "/%s/wifi_sta_info" , WiFi.hostname().c_str() ).c_str() ,
-						   String_Format(
-									"{\"SSID:\":\"%s\",\"BSSID\":\"%s\",\"RSSI\":%d,\"channel\":%d}"
-									, WiFi.SSID().c_str()
-									, WiFi.BSSIDstr().c_str()
-									, WiFi.RSSI()
-									, WiFi.channel()
-									).c_str()
-							);
-	/*
-	WiFiPhyMode_t getPhyMode();
-	typedef enum WiFiPhyMode
-	{
-		WIFI_PHY_MODE_11B = 1, WIFI_PHY_MODE_11G = 2, WIFI_PHY_MODE_11N = 3
-	} WiFiPhyMode_t;
-	*/
-	_timer_sysinfo.countdown( 10 );
-}
-/*
-error_t DLRMQTT::sysinfo()
-{
-	_mqtt_client->publish( 
-			String_Format( "/%s/sysinfo" , WiFi.hostname().c_str() ).c_str() ,
-			String_Format( "{\n" \
-				"getChipId:          %ld\n" \
-				",getSdkVersion:      %s\n" \
-				",getCoreVersion:     %s\n" \
-				",getFreeHeap:        %ld\n" \
-				",getCpuFreqMHz:      %ld\n" \
-				",getSketchSize:      %ld\n" \
-				",getFreeSketchSpace: %ld\n" \
-				",getCycleCount:      %ld\n" \
-				"\n}"
-				, ESP.getChipId()
-				, ESP.getSdkVersion()
-				, ESP.getCoreVersion().c_str()
-				, ESP.getFreeHeap()
-				, ESP.getCpuFreqMHz()
-				, ESP.getSketchSize()
-				, ESP.getFreeSketchSpace()
-				, ESP.getFreeSketchSpace()
-				, ESP.getCycleCount()
-			).c_str()
-		);
-}
-*/
 	

@@ -27,9 +27,9 @@ ICACHE_FLASH_ATTR DLRMQTTMessage::DLRMQTTMessage( uint16_t pri , const char* par
 	topic          = String_Format( "/%s/%s" , WiFi.hostname().c_str() , param_topic );
 	
 	type   = MQTT_TEXT;
-	lenght = strlen( param_payload ) + 1;
-	payload.text = new char[ lenght ];
-	std::memcpy( payload.text , param_payload , lenght - 1 );
+	lenght = strlen( param_payload );
+	payload.text = new char[ lenght + 1];
+	std::memcpy( payload.text , param_payload , lenght );
 	payload.text[lenght] = 0;
 	
 }

@@ -10,7 +10,7 @@
 
 #include <ESP8266WiFi.h>
 
-#define MQTT_MAX_PACKET_SIZE 512
+// modify PubSubClient.h => #define MQTT_MAX_PACKET_SIZE 0xff
 #include <PubSubClient.h>
 
 #include "Countdown.h"

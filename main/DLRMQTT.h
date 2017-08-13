@@ -14,7 +14,7 @@ class DLRMQTT: public DLRObject
 		error_t setup();
 		
 		error_t reconnect();
-		error_t sysinfo();
+		error_t module_info();
 		
 		
 		//void callback( char* topic , byte* payload , unsigned int length );
@@ -25,7 +25,7 @@ class DLRMQTT: public DLRObject
 		String   username;
 		String   password;
 		
-		Countdown     _timer_sysinfo;
+		Countdown _timer_module_info;
 	
 		Countdown     _timer_reconnect;
 		WiFiClient*   _tcp_Client; //WiFiClientSecure _tcp_Client;

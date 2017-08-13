@@ -83,6 +83,7 @@ error_t ICACHE_FLASH_ATTR DLRWifiManager::setup()
     // Wait for connection
 	_timer_reconnect.countdown( 5 ); // 30 seconds
 	_timer_module_info.countdown( 10 );
+	return( 0 );
 }
 
 error_t ICACHE_FLASH_ATTR DLRWifiManager::loop()
@@ -106,25 +107,59 @@ error_t ICACHE_FLASH_ATTR DLRWifiManager::loop()
 			if( _actual_timestamp > (2017 - 1970)*(365*24*3600) ) 
 			{
 				system_boot_time = _actual_timestamp - ( millis()/1000);
-				addLog( 0 , LOG_DEBUG , "NTP on\tcurrent time: %s\n" , ctime(&_actual_timestamp) );
-				addLog( 0 , LOG_DEBUG , "system_boot_time: %s\n" , ctime(&system_boot_time) );
+				addLog( 0 , LOG_DEBUG , "NTP on\tcurrent time: %s" , ctime(&_actual_timestamp) );
+				addLog( 0 , LOG_DEBUG , "system_boot_time: %s" , ctime(&system_boot_time) );
 			}
 		}
 	}
+	return( 0 );
 }
 
 
 error_t ICACHE_FLASH_ATTR DLRWifiManager::module_info()
 {
-	addLog( 0 , LOG_DEBUG , "DLRWifiManager::module_info()...\n" );
-	mqtt_publish( LOG_NOTICE , "Wifi" 
-					, "{\"SSID:\":\"%s\",\"BSSID\":\"%s\",\"RSSI\":%d,\"channel\":%d}"
+	time_t timestamp = time( NULL );
+	addLog( ObjectID , LOG_NOTICE ,
+		"{\"timestamp\":%ld,\"SSID:\":\"%s\",\"BSSID\":\"%s\",\"RSSI\":%d,\"channel\":%d,\"WiFiPhyMode\":%d}\n"
+					, timestamp
 					, WiFi.SSID().c_str()
 					, WiFi.BSSIDstr().c_str()
 					, WiFi.RSSI()
 					, WiFi.channel()
+					, WiFi.getPhyMode()
 				);
-	_timer_module_info.countdown( 10 );
+	if ( MQTT_MAX_PACKET_SIZE > 128 )
+	{
+		mqtt_publish( LOG_NOTICE , "Wifi" ,
+			"{\"timestamp\":%ld,\"SSID:\":\"%s\",\"BSSID\":\"%s\",\"RSSI\":%d,\"channel\":%d,\"WiFiPhyMode\":%d}"
+						, timestamp
+						, WiFi.SSID().c_str()
+						, WiFi.BSSIDstr().c_str()
+						, WiFi.RSSI()
+						, WiFi.channel()
+						, WiFi.getPhyMode()
+					);
+	} else
+	{
+		mqtt_publish( LOG_NOTICE , "Wifi" ,
+			"{\"SSID:\":\"%s\",\"BSSID\":\"%s\",\"RSSI\":%d,\"channel\":%d,\"WiFiPhyMode\":%d}"
+						, WiFi.SSID().c_str()
+						, WiFi.BSSIDstr().c_str()
+						, WiFi.RSSI()
+						, WiFi.channel()
+						, WiFi.getPhyMode()
+					);
+	}
+	
+	/*
+	WiFiPhyMode_t getPhyMode();
+	typedef enum WiFiPhyMode
+	{
+		WIFI_PHY_MODE_11B = 1, WIFI_PHY_MODE_11G = 2, WIFI_PHY_MODE_11N = 3
+	} WiFiPhyMode_t;
+	*/
+	_timer_module_info.countdown( 5 );
+	return( 0 );
 }
 
 error_t ICACHE_FLASH_ATTR DLRWifiManager::reconnect_STA()
@@ -147,4 +182,5 @@ error_t ICACHE_FLASH_ATTR DLRWifiManager::reconnect_STA()
         }
     }
 	*/
+	return( 0 );
 }

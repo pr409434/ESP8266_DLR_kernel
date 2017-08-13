@@ -72,7 +72,7 @@ error_t ICACHE_FLASH_ATTR DLRObjectManager::loop()
 	{
 		_last_timestamp = _timestamp;
 	}
-	if( ( _timestamp - _last_timestamp ) > 10000 )
+	if( ( _timestamp - _last_timestamp ) > 60000 )
 	{
 		_last_timestamp = _timestamp;
 		ObjectList();
