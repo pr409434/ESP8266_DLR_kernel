@@ -30,7 +30,7 @@ uint64_t MicroTimeStampTimeOffset = 0;
 uint64_t LastMicroTimeStamp       = micros();
 
 
-bool POWER_RELAY_VALUE = HIGH;
+
 
 
 void ICACHE_FLASH_ATTR setup()

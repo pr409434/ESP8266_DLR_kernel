@@ -12,7 +12,7 @@ static void FanInterruptHandles()
 {
 	FanInterruptCounter++;
 }
-
+bool POWER_RELAY_VALUE = HIGH;
 
 ICACHE_FLASH_ATTR DLRSensor::DLRSensor()
 {
@@ -77,8 +77,9 @@ error_t ICACHE_FLASH_ATTR DLRSensor::module_info()
 		temperature = sensor->getTempC();
 	}
 	mqtt_publish( LOG_NOTICE , name ,
-		"{\"timestamp\":%ld,\"temperature\":%0.2f,\"rpm\":%0.8f}"
+		"{\"timestamp\":%ld,\"power\":%d,\"temperature\":%0.2f,\"rpm\":%0.8f}"
 				, timestamp
+				, ( POWER_RELAY_VALUE ? 0 : 1 )
 				, temperature
 				, rpm
 			);
