@@ -4,17 +4,21 @@
 
 
 //#define MQTT_CALLBACK_SIGNATURE std::function<void(char*, uint8_t*, unsigned int)> callback
-void ICACHE_FLASH_ATTR _MQTTcallback( char* topic , byte* payload , unsigned int length )
+void ICACHE_FLASH_ATTR _MQTTcallback( char* mqtt_topic , byte* mqtt_payload , unsigned int mqtt_length )
 {
-	addLog( 0 , LOG_DEBUG , "MQTT message %s , topic: %s\n"
-			, topic
+	String topic( mqtt_topic );
+	String payload( std::string( (char*) mqtt_payload , mqtt_length ).c_str() );
+	addLog( 0 , LOG_DEBUG , "MQTT message topic:[%s] , payload: [%s]\n"
+			, topic.c_str()
+			, payload.c_str()
 		);
-	Serial.println("\n/*********************************************/");
-	for (int i = 0; i < length; i++) {
-		Serial.print((char)payload[i]);
+	DynamicJsonBuffer jsonBuffer;
+	JsonObject& root = jsonBuffer.parseObject( payload );
+	if( root.success() )
+	{
+		POWER_RELAY_VALUE = ( root["power"] == 0 ? HIGH : LOW );
+		addLog( 0 , LOG_DEBUG , "POWER_RELAY_VALUE:%d\n" , POWER_RELAY_VALUE );
 	}
-	Serial.println("/*********************************************/\n");
-	Serial.println();
 }
 
 
@@ -124,7 +128,7 @@ error_t ICACHE_FLASH_ATTR DLRMQTT::reconnect()
 			this->module_info();
             // Resubscribe to all your topics here so that they are
             // resubscribed each time you reconnect
-			_mqtt_client->subscribe("inTopic");
+			_mqtt_client->subscribe("/ESP_2318C6/subdue");
 			_timer_mqtt_send.countdown( 5 );
         } else {
 			addLog( 0 , LOG_DEBUG , "failed, rc=%d retry again in 10 seconds\n" , _mqtt_client->state() );

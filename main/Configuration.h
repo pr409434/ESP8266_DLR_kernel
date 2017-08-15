@@ -5,6 +5,7 @@
                     INCLUDE
 *****************************************************************************/
 #include <Arduino.h>
+#include <ArduinoJson.h>
 
 //#include "certificates.h"
 
@@ -115,6 +116,11 @@ extern uint64_t  LastMicroTimeStamp;
 
 extern uint64_t microtimes();
 /*****************************************************************************/
+#define POWER_RELAY_PIN D1
+extern bool POWER_RELAY_VALUE;
+/*****************************************************************************/
+
+
 extern String String_Format( const String fmt , ... );
 extern error_t addLog( ObjectID_t ObjectID , uint16_t pri , const String fmt , ... );
 extern error_t mqtt_publish( uint16_t pri , const char* topic , const String fmt , ... );

@@ -1,20 +1,7 @@
 #include "DLRWifiManager.h"
 
-		/*
-        WiFiEventHandler onStationModeConnected(std::function<void(const WiFiEventStationModeConnected&)>);
-        WiFiEventHandler onStationModeDisconnected(std::function<void(const WiFiEventStationModeDisconnected&)>);
-        WiFiEventHandler onStationModeAuthModeChanged(std::function<void(const WiFiEventStationModeAuthModeChanged&)>);
-        WiFiEventHandler onStationModeGotIP(std::function<void(const WiFiEventStationModeGotIP&)>);
-        WiFiEventHandler onStationModeDHCPTimeout(std::function<void(void)>);
-        WiFiEventHandler onSoftAPModeStationConnected(std::function<void(const WiFiEventSoftAPModeStationConnected&)>);
-        WiFiEventHandler onSoftAPModeStationDisconnected(std::function<void(const WiFiEventSoftAPModeStationDisconnected&)>);
-        WiFiEventHandler onSoftAPModeProbeRequestReceived(std::function<void(const WiFiEventSoftAPModeProbeRequestReceived&)>);
-		// WiFiEventHandler onWiFiModeChange(std::function<void(const WiFiEventModeChange&)>);
-		
-		setOutputPower(float dBm);
-		bool mode(WiFiMode_t); WIFI_PHY_MODE_11B = 1, WIFI_PHY_MODE_11G = 2, WIFI_PHY_MODE_11N = 3
-		*/
 
+/*
 void ICACHE_FLASH_ATTR WiFiEvent( WiFiEvent_t event )
 {
 	switch( event )
@@ -35,12 +22,10 @@ void ICACHE_FLASH_ATTR WiFiEvent( WiFiEvent_t event )
 		case WIFI_EVENT_STAMODE_AUTHMODE_CHANGE:
 			addLog( 0 , LOG_DEBUG , "WiFi client authentication mode changed.\n");
 			break;
-		/*
 		// THIS IS A NEW CONSTANT ENABLE WITH UPDATED SDK
 		case WIFI_STAMODE_DHCP_TIMEOUT:
 			addLog( 0 , LOG_DEBUG , "WiFi client DHCP timeout reached.");
 			break;
-		*/
 		case WIFI_EVENT_SOFTAPMODE_STACONNECTED:
 			addLog( 0 , LOG_DEBUG , "WiFi accesspoint: new client connected. Clients: %d\n" , WiFi.softAPgetStationNum() );
 			break;
@@ -55,6 +40,24 @@ void ICACHE_FLASH_ATTR WiFiEvent( WiFiEvent_t event )
 			break;
 	}
 }
+*/
+
+		/*
+        WiFiEventHandler onStationModeConnected(std::function<void(const WiFiEventStationModeConnected&)>);
+        WiFiEventHandler onStationModeDisconnected(std::function<void(const WiFiEventStationModeDisconnected&)>);
+        WiFiEventHandler onStationModeAuthModeChanged(std::function<void(const WiFiEventStationModeAuthModeChanged&)>);
+        WiFiEventHandler onStationModeGotIP(std::function<void(const WiFiEventStationModeGotIP&)>);
+        WiFiEventHandler onStationModeDHCPTimeout(std::function<void(void)>);
+        WiFiEventHandler onSoftAPModeStationConnected(std::function<void(const WiFiEventSoftAPModeStationConnected&)>);
+        WiFiEventHandler onSoftAPModeStationDisconnected(std::function<void(const WiFiEventSoftAPModeStationDisconnected&)>);
+        WiFiEventHandler onSoftAPModeProbeRequestReceived(std::function<void(const WiFiEventSoftAPModeProbeRequestReceived&)>);
+		// WiFiEventHandler onWiFiModeChange(std::function<void(const WiFiEventModeChange&)>);
+		
+		setOutputPower(float dBm);
+		bool mode(WiFiMode_t); WIFI_PHY_MODE_11B = 1, WIFI_PHY_MODE_11G = 2, WIFI_PHY_MODE_11N = 3
+		*/
+
+		
 
 ICACHE_FLASH_ATTR DLRWifiManager::DLRWifiManager()
 {
@@ -63,7 +66,9 @@ ICACHE_FLASH_ATTR DLRWifiManager::DLRWifiManager()
 		name = (char *) "WifiManager";
 	}
 	priority = 0;
+
 }	
+
 ICACHE_FLASH_ATTR DLRWifiManager::~DLRWifiManager()
 {
 	
@@ -71,14 +76,19 @@ ICACHE_FLASH_ATTR DLRWifiManager::~DLRWifiManager()
 
 error_t ICACHE_FLASH_ATTR DLRWifiManager::setup()
 {
-	WiFi.onEvent( WiFiEvent );
 	// sNTP config
 	configTime( 2 * 3600 , 0 , // , 1 * 3600,
 				"192.168.1.47",
 				"192.168.1.27",
 				"pool.ntp.org");
+	
 	// Connect to WiFi network
 	WiFi.begin( ssid , password );
+	//while( WiFi.status() != WL_CONNECTED )
+	for( int idx = 0 ; ( idx < 10 ) && ( WiFi.status() != WL_CONNECTED ) ; idx++ )
+	{
+		delay( 500 );
+	}
 
     // Wait for connection
 	_timer_reconnect.countdown( 5 ); // 30 seconds
@@ -97,10 +107,6 @@ error_t ICACHE_FLASH_ATTR DLRWifiManager::loop()
 		}
 	} else
 	{
-		if( _timer_module_info.expired() )
-		{
-			module_info();
-		}
 		if ( system_boot_time == 0 )
 		{
 			time_t _actual_timestamp = time( NULL );
@@ -110,6 +116,10 @@ error_t ICACHE_FLASH_ATTR DLRWifiManager::loop()
 				addLog( 0 , LOG_DEBUG , "NTP on\tcurrent time: %s" , ctime(&_actual_timestamp) );
 				addLog( 0 , LOG_DEBUG , "system_boot_time: %s" , ctime(&system_boot_time) );
 			}
+		}
+		if( _timer_module_info.expired() )
+		{
+			module_info();
 		}
 	}
 	return( 0 );
