@@ -61,11 +61,13 @@ void ICACHE_FLASH_ATTR setup()
 	delay(1000);
 	ObjectsQueue.push_back( new DLRMQTT() );
 	delay(1000);
-#ifdef POWER_RELAY_PIN
-	ObjectsQueue.push_back( new DLRSensor() );
-#else //POWER_RELAY_PIN
-	ObjectsQueue.push_back( new DLRSensorDHT22() );
-#endif //POWER_RELAY_PIN
+	if ( false )
+	{
+		ObjectsQueue.push_back( new DLRSensor() );
+	} else
+	{
+		ObjectsQueue.push_back( new DLRSensorDHT22() );
+	}
 	delay(1000);
 	ObjectManager->main_setup();
 	addLog( 0 , LOG_DEBUG , "Exit setup() -> ObjectQueue.size(): %ld\n" , ObjectsQueue.size() );
