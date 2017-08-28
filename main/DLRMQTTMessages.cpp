@@ -88,6 +88,7 @@ bool ICACHE_FLASH_ATTR DLRMQTTMessagePriorityComparison::operator() ( DLRMQTTMes
 }
 
 DLRMQTTMessagesQueue MQTTMessagesQueue;
+DLRMQTTMessagesQueue Temporary_MQTTMessagesQueue;
 
 /*
 MessagesQueue.push( new DLRMQTTMessage( ObjectID , pri , message ) );

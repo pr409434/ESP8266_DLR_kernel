@@ -66,6 +66,19 @@ ICACHE_FLASH_ATTR DLRWifiManager::DLRWifiManager()
 		name = (char *) "WifiManager";
 	}
 	priority = 0;
+	time_t timestamp   = time(NULL);
+	
+	current_wifi_rssi.priorities  = LOG_ObjectID_PRI( ObjectID , LOG_INFO );
+	current_wifi_rssi.type        = DLR_SENSOR_TYPE_WIFI_RSSI;
+	current_wifi_rssi.timestamp   = timestamp;
+	current_wifi_rssi.RSSI        = NAN;
+	CurrentSensorsEvents["Wifi"]["RSSI"] = &current_wifi_rssi;
+	
+	current_wifi_disconnect_count.priorities = LOG_ObjectID_PRI( ObjectID , LOG_INFO );
+	current_wifi_disconnect_count.type       = DLR_SENSOR_TYPE_WIFI_CURRENT_WIFI_DISCONNECT_COUNT;
+	current_wifi_disconnect_count.timestamp  = timestamp;
+	current_wifi_disconnect_count.counter    = 0;
+	CurrentSensorsEvents["Wifi"]["disconnect_count"] = &current_wifi_disconnect_count;
 
 }	
 
@@ -92,17 +105,20 @@ error_t ICACHE_FLASH_ATTR DLRWifiManager::setup()
 
     // Wait for connection
 	_timer_reconnect.countdown( 5 ); // 30 seconds
-	_timer_module_info.countdown( 10 );
+	_timer_module_info.countdown_ms( DLR_WIFIMANAGER_MODULE_INFO_TIME_MS );
 	return( 0 );
 }
 
 error_t ICACHE_FLASH_ATTR DLRWifiManager::loop()
 {
+	//WiFi.disconnect();
 	if( WiFi.status() != WL_CONNECTED )
 	{
 		if( _timer_reconnect.expired() )
 		{
 			WiFi.reconnect();
+			current_wifi_disconnect_count.timestamp  = time(NULL);
+			current_wifi_disconnect_count.counter    += 1;
 			_timer_reconnect.countdown( 5 );
 		}
 	} else
@@ -117,10 +133,10 @@ error_t ICACHE_FLASH_ATTR DLRWifiManager::loop()
 				addLog( 0 , LOG_DEBUG , "system_boot_time: %s" , ctime(&system_boot_time) );
 			}
 		}
-		if( _timer_module_info.expired() )
-		{
-			module_info();
-		}
+	}
+	if( _timer_module_info.expired() )
+	{
+		module_info();
 	}
 	return( 0 );
 }
@@ -129,29 +145,35 @@ error_t ICACHE_FLASH_ATTR DLRWifiManager::loop()
 error_t ICACHE_FLASH_ATTR DLRWifiManager::module_info()
 {
 	time_t timestamp = time( NULL );
+	current_wifi_rssi.timestamp   = timestamp;
+	current_wifi_rssi.RSSI        = WiFi.RSSI();
+
 	addLog( ObjectID , LOG_NOTICE ,
-		"{\"timestamp\":%ld,\"SSID:\":\"%s\",\"BSSID\":\"%s\",\"RSSI\":%d,\"channel\":%d,\"WiFiPhyMode\":%d}\n"
+		"{\"timestamp\":%ld,\"SSID:\":\"%s\",\"BSSID\":\"%s\",\"RSSI\":%d,\"reconnect\":%ld,\"channel\":%d,\"WiFiPhyMode\":%d}\n"
 					, timestamp
 					, WiFi.SSID().c_str()
 					, WiFi.BSSIDstr().c_str()
 					, WiFi.RSSI()
+					, current_wifi_disconnect_count.counter
 					, WiFi.channel()
 					, WiFi.getPhyMode()
 				);
+	
 	if ( MQTT_MAX_PACKET_SIZE > 128 )
 	{
-		mqtt_publish( LOG_NOTICE , "Wifi" ,
-			"{\"timestamp\":%ld,\"SSID:\":\"%s\",\"BSSID\":\"%s\",\"RSSI\":%d,\"channel\":%d,\"WiFiPhyMode\":%d}"
+		mqtt_publish( LOG_INFO , "Wifi" ,
+			"{\"timestamp\":%ld,\"SSID:\":\"%s\",\"BSSID\":\"%s\",\"RSSI\":%d,\"reconnect\":%ld,\"channel\":%d,\"WiFiPhyMode\":%d}"
 						, timestamp
 						, WiFi.SSID().c_str()
 						, WiFi.BSSIDstr().c_str()
 						, WiFi.RSSI()
+						, current_wifi_disconnect_count.counter
 						, WiFi.channel()
 						, WiFi.getPhyMode()
 					);
 	} else
 	{
-		mqtt_publish( LOG_NOTICE , "Wifi" ,
+		mqtt_publish( LOG_INFO , "Wifi" ,
 			"{\"SSID:\":\"%s\",\"BSSID\":\"%s\",\"RSSI\":%d,\"channel\":%d,\"WiFiPhyMode\":%d}"
 						, WiFi.SSID().c_str()
 						, WiFi.BSSIDstr().c_str()
@@ -168,7 +190,7 @@ error_t ICACHE_FLASH_ATTR DLRWifiManager::module_info()
 		WIFI_PHY_MODE_11B = 1, WIFI_PHY_MODE_11G = 2, WIFI_PHY_MODE_11N = 3
 	} WiFiPhyMode_t;
 	*/
-	_timer_module_info.countdown( 5 );
+	_timer_module_info.countdown_ms( DLR_WIFIMANAGER_MODULE_INFO_TIME_MS );
 	return( 0 );
 }
 

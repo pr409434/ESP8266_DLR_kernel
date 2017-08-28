@@ -74,7 +74,32 @@ ICACHE_FLASH_ATTR DLRMQTT::~DLRMQTT()
 
 error_t ICACHE_FLASH_ATTR DLRMQTT::loop()
 {
-	
+	//MQTTMessagesQueue
+	if( MQTTMessagesQueue.size() > MAXIMUM_MQTTMESSAGES_QUEUE )
+	{
+		//DLRMQTTMessagesQueue Temporary_MQTTMessagesQueue;
+		uint16_t counter = 0;
+		uint16_t delete_counter = 0;
+		while ( ! MQTTMessagesQueue.empty())
+		{
+			if( counter < MAXIMUM_MQTTMESSAGES_QUEUE )
+			{
+				Temporary_MQTTMessagesQueue.push( MQTTMessagesQueue.top() );
+			} else
+			{
+				delete MQTTMessagesQueue.top();
+				delete_counter += 1;
+			}
+			MQTTMessagesQueue.pop();
+			counter += 1;
+		}
+		while ( ! Temporary_MQTTMessagesQueue.empty())
+		{
+			MQTTMessagesQueue.push( Temporary_MQTTMessagesQueue.top() );
+			Temporary_MQTTMessagesQueue.pop();
+		}
+		addLog( ObjectID , LOG_WARNING , "DELETE %ld MQTTMessages\n" , delete_counter );
+	}
 	if( _mqtt_client->loop() )
 	{
 		size_t _tcp_Client_size = _tcp_Client->availableForWrite();
@@ -91,7 +116,7 @@ error_t ICACHE_FLASH_ATTR DLRMQTT::loop()
 									 );
 				delete MQTTMessagesQueue.top();
 				MQTTMessagesQueue.pop();
-				_timer_mqtt_send.countdown_ms( 500 );
+				_timer_mqtt_send.countdown_ms( DLR_MQTT_TIMER_MQTT_SEND_TIME_MS );
 			}
 		}
 	} else
@@ -108,7 +133,7 @@ error_t ICACHE_FLASH_ATTR DLRMQTT::loop()
 error_t ICACHE_FLASH_ATTR DLRMQTT::setup()
 {
 	_timer_reconnect.countdown( 10 );
-	_timer_module_info.countdown( 60 );
+	module_info();
 	return( 0 );
 }
 
@@ -139,7 +164,19 @@ error_t ICACHE_FLASH_ATTR DLRMQTT::reconnect()
 }
 error_t ICACHE_FLASH_ATTR DLRMQTT::module_info()
 {
-	_timer_module_info.countdown( 60 );
+	time_t timestamp   = time( NULL );
+	addLog( ObjectID , LOG_NOTICE ,
+			"{\"timestamp\":%ld,\"MQTTMessagesQueue\":%ld}\n"
+				, timestamp
+				, MQTTMessagesQueue.size()
+				);
+	mqtt_publish( LOG_INFO , "sysinfo" ,
+			"{\"timestamp\":%ld,\"MQTTMessagesQueue\":%ld}\n"
+				, timestamp
+				, MQTTMessagesQueue.size()
+				);
+	
+	_timer_module_info.countdown( DLR_MQTT_MODULE_INFO_TIME );
 	return( 0 );
 }
 

@@ -26,6 +26,7 @@
 #include <vector>
 #include <list>
 #include <queue>
+#include <map>
 #include <algorithm>
 #include <functional>
 
@@ -98,7 +99,11 @@
 /*****************************************************************************
                     MODULE_INFO_TIME in millisecond
 *****************************************************************************/
-#define DLR_SENSORS_EVENT_MODULE_INFO_TIME 60 * 1000
+#define DLR_SENSORS_EVENT_MODULE_INFO_TIME_ms 1 * 1000
+#define DLR_WIFIMANAGER_MODULE_INFO_TIME_MS   1 * 1000
+#define DLR_SYSTEMWATCH_MODULE_INFO_TIME_MS   5 * 1000
+#define DLR_MQTT_MODULE_INFO_TIME		      1
+#define DLR_MQTT_TIMER_MQTT_SEND_TIME_MS          200
 
 /*****************************************************************************
                     TYPEDEF
@@ -114,6 +119,9 @@ extern const char* password;
 extern const char* mqtt_server;
 extern const char* mqtt_username;
 extern const char* mqtt_password;
+
+#define MAXIMUM_MQTTMESSAGES_QUEUE 16
+
 /*****************************************************************************/
 extern time_t    system_boot_time;
 extern uint64_t  MicroTimeStampTimeOffset;

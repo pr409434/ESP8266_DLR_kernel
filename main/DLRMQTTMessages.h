@@ -45,6 +45,7 @@ class DLRMQTTMessagePriorityComparison
 
 typedef std::priority_queue<DLRMQTTMessage *,std::vector<DLRMQTTMessage *>,DLRMQTTMessagePriorityComparison> DLRMQTTMessagesQueue;
 extern DLRMQTTMessagesQueue MQTTMessagesQueue;
+extern DLRMQTTMessagesQueue Temporary_MQTTMessagesQueue;
 
 
 #endif //DLRMQTTMessage_H

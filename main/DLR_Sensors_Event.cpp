@@ -1,14 +1,15 @@
 #include "DLR_Sensors_Event.h"
 
+DLRSensorsEventsDictionary CurrentSensorsEvents;
 
-bool operator==(const sensors_event_t& lhs, const sensors_event_t& rhs)
+bool operator==(const DLR_sensors_event_t& lhs, const DLR_sensors_event_t& rhs)
 {
 	return (
 				   ( LOG_PRI( lhs.priorities ) ==  LOG_PRI( rhs.priorities ) )
 				&& ( lhs.timestamp == rhs.timestamp )
 	);
 }
-bool operator!=(const sensors_event_t& lhs, const sensors_event_t& rhs)
+bool operator!=(const DLR_sensors_event_t& lhs, const DLR_sensors_event_t& rhs)
 {
 	return (
 				   ( LOG_PRI( lhs.priorities ) !=  LOG_PRI( rhs.priorities ) )
@@ -16,7 +17,7 @@ bool operator!=(const sensors_event_t& lhs, const sensors_event_t& rhs)
 	);
 }
 
-bool operator>(const sensors_event_t& lhs, const sensors_event_t& rhs)
+bool operator>(const DLR_sensors_event_t& lhs, const DLR_sensors_event_t& rhs)
 {
 
 		if( LOG_PRI( lhs.priorities ) <  LOG_PRI( rhs.priorities ) )
@@ -29,7 +30,7 @@ bool operator>(const sensors_event_t& lhs, const sensors_event_t& rhs)
 		}
 		return( false );
 }
-bool operator>=(const sensors_event_t& lhs, const sensors_event_t& rhs)
+bool operator>=(const DLR_sensors_event_t& lhs, const DLR_sensors_event_t& rhs)
 {
 
 		if( LOG_PRI( lhs.priorities ) <  LOG_PRI( rhs.priorities ) )
@@ -46,7 +47,7 @@ bool operator>=(const sensors_event_t& lhs, const sensors_event_t& rhs)
 		);
 }
 
-bool operator<(const sensors_event_t& lhs, const sensors_event_t& rhs)
+bool operator<(const DLR_sensors_event_t& lhs, const DLR_sensors_event_t& rhs)
 {
 
 		if( LOG_PRI( lhs.priorities ) >  LOG_PRI( rhs.priorities ) )
@@ -59,7 +60,7 @@ bool operator<(const sensors_event_t& lhs, const sensors_event_t& rhs)
 		}
 		return( false );
 }
-bool operator<=(const sensors_event_t& lhs, const sensors_event_t& rhs)
+bool operator<=(const DLR_sensors_event_t& lhs, const DLR_sensors_event_t& rhs)
 {
 
 		if( LOG_PRI( lhs.priorities ) >  LOG_PRI( rhs.priorities ) )
@@ -76,10 +77,14 @@ bool operator<=(const sensors_event_t& lhs, const sensors_event_t& rhs)
 		);
 }
 
+bool MapSensorsEventsComp::operator() ( const String& lhs, const String& rhs ) const
+{
+	return( lhs < rhs );
+}
 
 
 
-
+/*
 DLREventsManager::DLREventsManager()
 {
 	if( name == nullptr )
@@ -108,6 +113,6 @@ error_t DLREventsManager::module_info()
 	_timer_module_info.countdown_ms( DLR_SENSORS_EVENT_MODULE_INFO_TIME );
 	return( 0 );
 }
-
+*/
 //		Countdown _timer_module_info;
 
